@@ -8,7 +8,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#e6eff0]">
+      <body className="bg-[#e9f8fb]">
         <div className="flex">
           {/* Sidebar */}
           <Sidebar />
