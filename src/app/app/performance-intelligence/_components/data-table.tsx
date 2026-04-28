@@ -65,12 +65,12 @@ export default function PerformanceIntelligence() {
 
           {/* HEADER */}
           <TableHeader className="  ">
-            
+             <TableRow className="" >
               <TableHead className=" rounded-l-3xl   ">Rank</TableHead>
               <TableHead className="   ">Job Category</TableHead>
               <TableHead className="  ">Total Requests</TableHead>
               <TableHead className=" rounded-r-3xl ">Revenue Generated</TableHead>
-           
+           </TableRow>
           </TableHeader>
 
           {/* BODY */}
