@@ -128,3 +128,46 @@
     @apply font-sans;
   }
 }
+
+.heading {
+  @apply text-[36px] font-bold tracking-[-0.82px];
+}
+
+/* Custom Scrollbar Styling - Matches Theme */
+/* For Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #00a299, #40b480);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #008b7f, #35956f);
+  background-clip: padding-box;
+}
+
+/* For Firefox */
+* {
+  scrollbar-color: #00a299 transparent;
+  scrollbar-width: thin;
+}
+
+/* Hide scrollbar utility class */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

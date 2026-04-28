@@ -8,18 +8,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#e6eff0]">
-        <div className="flex">
+      <body className=" ">
+        <div className="flex bg-[#004D54] max-h-screen overflow-y-auto">
           {/* Sidebar */}
           <Sidebar />
 
           {/* Main Content */}
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-6 bg-[#EAFCFF] rounded-tl-[20px] rounded-bl-[20px] h-screen overflow-y-auto">
             {/* Navbar */}
             <Navbar />
 
             {/* Page Content */}
-            <div className="mt-6">{children}</div>
+            <div className="mt-6 ">{children}</div>
           </div>
         </div>
       </body>

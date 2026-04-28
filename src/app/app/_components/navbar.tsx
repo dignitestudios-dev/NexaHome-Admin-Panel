@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Navbar() {
   return (
-    <div className="w-full bg-gray-100 rounded-2xl px-6 py-4 flex items-center justify-between shadow-sm">
+    <div className="w-full bg-white rounded-2xl px-6 py-6 flex items-center justify-between shadow-sm">
       {/* Empty left space (as in design) */}
       <div />
 
