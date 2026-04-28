@@ -128,3 +128,7 @@
     @apply font-sans;
   }
 }
+
+.heading {
+  @apply text-[36px] font-bold tracking-[-0.82px];
+}

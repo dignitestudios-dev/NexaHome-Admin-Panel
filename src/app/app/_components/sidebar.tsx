@@ -16,6 +16,7 @@ import {
   TableProperties,
   ArrowUpToLine
 } from "lucide-react";
+import Link from "next/link";
 
 const menu = [
   { label: "Dashboard", icon: LayoutDashboard, active: true },
@@ -36,7 +37,7 @@ const menu = [
 
 export default function Sidebar() {
   return (
-    <aside className="min-h-screen w-[260px] bg-[#004D54] text-white flex flex-col p-6 shadow-xl">
+    <aside className="h-screen overflow-y-auto w-[260px] bg-[#004D54] text-white flex flex-col p-6 shadow-xl">
       {/* Logo Section */}
       <div className="flex items-center gap-3 mb-10 px-2">
         <div className="relative w-10 h-10">
@@ -55,8 +56,9 @@ export default function Sidebar() {
         {menu.map((item, i) => {
           const Icon = item.icon;
           return (
-            <div
+            <Link
               key={i}
+              href="/app/performance-intelligence"
               className={`flex items-center gap-4 px-5 py-3.5 rounded-full cursor-pointer transition-all duration-200 ${
                 item.active
                   ? "bg-gradient-to-r from-[#00A299] to-[#40B480] text-white shadow-lg"
@@ -67,7 +69,7 @@ export default function Sidebar() {
               <span className={`text-[14px] ${item.active ? "font-bold" : "font-medium"}`}>
                 {item.label}
               </span>
-            </div>
+            </Link>
           );
         })}
       </nav>
