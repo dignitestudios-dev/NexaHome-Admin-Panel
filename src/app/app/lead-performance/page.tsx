@@ -2,19 +2,19 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
@@ -71,10 +71,19 @@ const PerformanceFilter = () => (
         <Filter size={18} />
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="w-48 rounded-xl border-none shadow-lg">
-      <DropdownMenuItem className="cursor-pointer">All Categories</DropdownMenuItem>
-      <DropdownMenuItem className="cursor-pointer">Highest Active</DropdownMenuItem>
-      <DropdownMenuItem className="cursor-pointer">Lowest Active</DropdownMenuItem>
+    <DropdownMenuContent
+      align="end"
+      className="w-48 rounded-xl border-none shadow-lg"
+    >
+      <DropdownMenuItem className="cursor-pointer">
+        All Categories
+      </DropdownMenuItem>
+      <DropdownMenuItem className="cursor-pointer">
+        Highest Active
+      </DropdownMenuItem>
+      <DropdownMenuItem className="cursor-pointer">
+        Lowest Active
+      </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
 );
@@ -98,7 +107,7 @@ const CategoryTable = ({ data }: CategoryTableProps) => (
 
       <TableBody>
         {data.map((row, index) => (
-          <TableRow 
+          <TableRow
             key={index}
             className="border-b border-gray-50 last:border-none hover:bg-gray-50/50 transition-colors"
           >
