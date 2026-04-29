@@ -105,7 +105,7 @@ export default function VerifiedExpertsPage() {
 
       {/* Title */}
       <h1 className="heading text-[#1C1C1C] my-4 tracking-tight ">
-        User Management
+        User Management Program
       </h1>
 
       {/* Table */}
