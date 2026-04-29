@@ -48,7 +48,7 @@ const menu = [
   {
     label: "Adv. Category Package",
     icon: Package,
-    link: "/app/advanced-category-package",
+    link: "/app/category-package",
   },
   {
     label: "Verified Experts",
