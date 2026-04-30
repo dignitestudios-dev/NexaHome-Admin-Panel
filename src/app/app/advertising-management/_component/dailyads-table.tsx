@@ -16,7 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Ellipsis } from "lucide-react";
+import { ChevronLeft, ChevronRight, Ellipsis } from "lucide-react";
 import EditAdModal from "./edit-ad-modal";
 
 export default function DailyAdsTable() {
@@ -174,28 +174,16 @@ export default function DailyAdsTable() {
       />
 
       {/* PAGINATION (STATIC UI) */}
-      <div className="flex flex-col sm:flex-row items-center justify-between py-4 space-y-2 sm:space-y-0">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm">Items per page:</span>
-
-          <select value={10} className="border rounded px-2 py-1 text-sm">
-            {[5, 10, 20, 50].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row items-center justify-end py-4 space-y-2 sm:space-y-0 ">
+        <div className="flex items-center space-x-4 bg-white">
           <Button variant="outline" size="sm" disabled>
-            Previous
+            <ChevronLeft />
           </Button>
 
-          <span className="text-sm font-medium">Page 1 of 1</span>
+          <span className="text-sm font-medium"> 01</span>
 
-          <Button variant="outline" size="sm" disabled>
-            Next
+          <Button className="" variant="outline" size="sm" disabled>
+            <ChevronRight />
           </Button>
         </div>
       </div>
