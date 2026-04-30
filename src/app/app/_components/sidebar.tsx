@@ -33,7 +33,7 @@ const menu = [
   {
     label: "Revenue & Monetization",
     icon: DollarSign,
-    link: "/app/revenue-monitization",
+    link: "/app/revenue-monetization",
   },
   {
     label: "Performance Analytics",
@@ -61,7 +61,7 @@ const menu = [
   {
     label: "Partner & Referral Management",
     icon: Handshake,
-    link: "/app/partner-referral-management",
+    link: "/app/referral-management",
   },
   {
     label: "Advertising Management",
