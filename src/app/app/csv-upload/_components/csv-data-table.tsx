@@ -10,45 +10,94 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Pagination from "@/components/global/pagination";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function CSVDataTable() {
+  const [page, setPage] = useState<number>(1);
+  const totalPages = 5;
+
+  const handlePrev = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
 
   // ✅ dummy loading
   const [loading] = useState(false);
 
   // ✅ dummy data
   const jobCategories = [
-    { _id: "1", rank: "01", name: "Baby Sitting", email: "baby@example.com", phone: "123-456-7890" },
-    { _id: "2", rank: "02", name: "House Cleaning", email: "clean@example.com", phone: "123-456-7890" },
-    { _id: "3", rank: "03", name: "Pet Care", email: "pet@example.com", phone: "123-456-7890" },
-    { _id: "4", rank: "04", name: "Gardening", email: "garden@example.com", phone: "123-456-7890" },
-    { _id: "5", rank: "05", name: "Cooking", email: "cook@example.com", phone: "123-456-7890" },
-    { _id: "6", rank: "06", name: "Elderly Care", email: "elderly@example.com", phone: "123-456-7890" },
-    { _id: "7", rank: "07", name: "Tutoring", email: "tutor@example.com", phone: "123-456-7890" },
-   
+    {
+      _id: "1",
+      rank: "01",
+      name: "Baby Sitting",
+      email: "baby@example.com",
+      phone: "123-456-7890",
+    },
+    {
+      _id: "2",
+      rank: "02",
+      name: "House Cleaning",
+      email: "clean@example.com",
+      phone: "123-456-7890",
+    },
+    {
+      _id: "3",
+      rank: "03",
+      name: "Pet Care",
+      email: "pet@example.com",
+      phone: "123-456-7890",
+    },
+    {
+      _id: "4",
+      rank: "04",
+      name: "Gardening",
+      email: "garden@example.com",
+      phone: "123-456-7890",
+    },
+    {
+      _id: "5",
+      rank: "05",
+      name: "Cooking",
+      email: "cook@example.com",
+      phone: "123-456-7890",
+    },
+    {
+      _id: "6",
+      rank: "06",
+      name: "Elderly Care",
+      email: "elderly@example.com",
+      phone: "123-456-7890",
+    },
+    {
+      _id: "7",
+      rank: "07",
+      name: "Tutoring",
+      email: "tutor@example.com",
+      phone: "123-456-7890",
+    },
   ];
 
   return (
     <div className="">
-     
-
-      <div className=" rounded-3xl overflow-hidden " >
-        <Table className="" >
-
+      <div className=" rounded-3xl overflow-hidden ">
+        <Table className="">
           {/* HEADER */}
           <TableHeader className="  ">
-             <TableRow className="" >
-   
+            <TableRow className="">
               <TableHead className=" rounded-l-3xl  ">Name</TableHead>
               <TableHead className="  ">Email</TableHead>
               <TableHead className=" rounded-r-3xl ">Phone</TableHead>
-           </TableRow>
+            </TableRow>
           </TableHeader>
 
           {/* BODY */}
           <TableBody className="">
             {loading ? (
-              <TableRow className="" >
+              <TableRow className="">
                 <TableCell className="h-24 text-center">
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -59,15 +108,20 @@ export default function CSVDataTable() {
             ) : jobCategories.length ? (
               jobCategories.map((category) => (
                 <TableRow key={category._id} className="">
-            
+                  <TableCell className="capitalize">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src="" alt={category.name} />
+                        <AvatarFallback className="bg-[#212121] text-white font-medium text-[12px]">
+                          {category.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
 
-                  <TableCell className="capitalize" >
-                    {category.name}
+                      <span>{category.name}</span>
+                    </div>
                   </TableCell>
 
-                  <TableCell>
-                    {category.email}
-                  </TableCell>
+                  <TableCell>{category.email}</TableCell>
 
                   <TableCell className="font-semibold ">
                     {category.phone}
@@ -82,41 +136,16 @@ export default function CSVDataTable() {
               </TableRow>
             )}
           </TableBody>
-
         </Table>
       </div>
 
       {/* PAGINATION (STATIC UI) */}
-      <div className="flex flex-col sm:flex-row items-center justify-between py-4 space-y-2 sm:space-y-0">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm">Items per page:</span>
-
-          <select
-            value={10}
-            className="border rounded px-2 py-1 text-sm"
-          >
-            {[5, 10, 20, 50].map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-
-          <span className="text-sm font-medium">
-            Page 1 of 1
-          </span>
-
-          <Button variant="outline" size="sm" disabled>
-            Next
-          </Button>
-        </div>
-      </div>
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPrev={handlePrev}
+        onNext={handleNext}
+      />
     </div>
   );
 }

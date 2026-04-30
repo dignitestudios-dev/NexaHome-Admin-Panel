@@ -18,12 +18,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronLeft, ChevronRight, Ellipsis } from "lucide-react";
 import EditAdModal from "./edit-ad-modal";
+import Pagination from "@/components/global/pagination";
 
 export default function DailyAdsTable() {
   // ✅ dummy loading
   const [loading] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAd, setSelectedAd] = useState<any>(null);
+  const [page, setPage] = useState<number>(1);
+  const totalPages = 5;
+
+  const handlePrev = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
 
   const handleEditClick = (ad: any) => {
     console.log("🚀 ~ handleEditClick ~ ad:", ad);
@@ -174,19 +185,12 @@ export default function DailyAdsTable() {
       />
 
       {/* PAGINATION (STATIC UI) */}
-      <div className="flex flex-col sm:flex-row items-center justify-end py-4 space-y-2 sm:space-y-0 ">
-        <div className="flex items-center space-x-4 bg-white">
-          <Button variant="outline" size="sm" disabled>
-            <ChevronLeft />
-          </Button>
-
-          <span className="text-sm font-medium"> 01</span>
-
-          <Button className="" variant="outline" size="sm" disabled>
-            <ChevronRight />
-          </Button>
-        </div>
-      </div>
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPrev={handlePrev}
+        onNext={handleNext}
+      />
     </div>
   );
 }

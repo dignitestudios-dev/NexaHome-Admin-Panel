@@ -1,22 +1,20 @@
 "use client";
 
 import { useState, useRef } from "react";
-import {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-} from "@/components/ui/dialog";
+import { Dialog, DialogPortal, DialogOverlay } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FileText, X } from "lucide-react";
 
 interface AddCategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: (success: boolean) => void;
 }
 
 export const AddCategoryModal = ({
   open,
   onOpenChange,
+  onSuccess = (success: boolean) => {},
 }: AddCategoryModalProps) => {
   const [file, setFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -37,6 +35,7 @@ export const AddCategoryModal = ({
   const handleAdd = () => {
     console.log("Uploaded File:", file);
     handleCancel();
+    onSuccess(true);
   };
 
   return (
@@ -45,7 +44,6 @@ export const AddCategoryModal = ({
         <DialogOverlay />
 
         <div className="fixed left-1/2 top-1/2 z-50 w-[490px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] bg-white shadow-lg">
-
           {/* Close Button */}
           <button
             onClick={() => onOpenChange(false)}
@@ -55,11 +53,8 @@ export const AddCategoryModal = ({
           </button>
 
           <div className="px-8 py-10">
-
             {/* Title */}
-            <h2 className="text-2xl font-semibold mb-6">
-              CSV Upload
-            </h2>
+            <h2 className="text-2xl font-semibold mb-6">CSV Upload</h2>
 
             {/* Upload Box */}
             <div
@@ -77,20 +72,18 @@ export const AddCategoryModal = ({
               />
               {file ? (
                 <p className="font-medium flex flex-col items-center gap-1">
-                    <FileText className="w-10 h-10 text-gray-600" />
-                    {file.name}
+                  <FileText className="w-10 h-10 text-gray-600" />
+                  {file.name}
                 </p>
               ) : (
                 <>
                   <p className="font-medium">Upload CSV</p>
-                  <p className="text-sm text-gray-500">
-                    Click to browse
-                  </p>
+                  <p className="text-sm text-gray-500">Click to browse</p>
                 </>
               )}
             </div>
 
-                {/* File Name Preview
+            {/* File Name Preview
                 {file && (
                 <p className="mt-3 text-sm text-gray-600">
                     Selected: {file.name}
@@ -99,7 +92,6 @@ export const AddCategoryModal = ({
 
             {/* Buttons */}
             <div className="flex gap-3 justify-center pt-6">
-
               <Button
                 onClick={handleCancel}
                 className="w-[200px] h-[45px] bg-gray-100 text-[#005864] hover:bg-gray-200"
@@ -114,7 +106,6 @@ export const AddCategoryModal = ({
               >
                 Upload
               </Button>
-
             </div>
           </div>
         </div>

@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import DataTable from "./_components/data-table";
@@ -17,6 +17,7 @@ import { LucideIcon } from "lucide-react";
 
 import { PartnerState } from "./_components/partner-state";
 import { useRouter, useSearchParams } from "next/navigation";
+import { CategoriesFilters } from "../categories/_components/categories-filters";
 
 /* ================= TYPES ================= */
 
@@ -34,7 +35,6 @@ type CategoryRow = {
 
 /* ================= DATA ================= */
 
-
 const tableData: CategoryRow[] = [
   { category: "Window Cleaning", total: 98, active: 56 },
   { category: "Plumbing Services", total: 87, active: 61 },
@@ -50,49 +50,49 @@ const tableData: CategoryRow[] = [
 
 /* ================= COMPONENTS ================= */
 
-
-
 /* ================= PAGE ================= */
 
 export default function LeadPerformancePage() {
-   const tabs = ["Top Jobs", "Top Areas"];
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const activeTab = searchParams.get("tab") || "Top Jobs";
-    
-    const handleTabChange = (tab: string) => {
+  const tabs = ["Top Jobs", "Top Areas"];
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const activeTab = searchParams.get("tab") || "Top Jobs";
+
+  const handleTabChange = (tab: string) => {
     router.push(`?tab=${tab}`);
   };
   const renderTable = (tab: string) => {
-      switch (tab) {
-        case "Top Jobs":
-          return <div><DataTable /></div>;
-  
-        case "Top Areas":
-          return <div><DataTable /></div>;
-      }
-    };
+    switch (tab) {
+      case "Top Jobs":
+        return (
+          <div>
+            <DataTable />
+          </div>
+        );
+
+      case "Top Areas":
+        return (
+          <div>
+            <DataTable />
+          </div>
+        );
+    }
+  };
   return (
     <div className="min-h-screen font-sans">
-      
       {/* Title */}
-      <h1 className="heading">
-        Partner Dashboard Overview
-      </h1>
+      <h1 className="heading">Partner Dashboard Overview</h1>
 
       {/* Stats */}
-    
-<PartnerState />
-      {/* Section Header */}
-     
-        <h2 className="text-[26px] font-bold text-[#1A1A1A]">
-         Category & Experts Insights
-        </h2>
 
-       <div
-          className="inline-flex items-center bg-white rounded-[10px] p-1 gap-1 shadow-sm"
-          
-        >
+      <PartnerState />
+      {/* Section Header */}
+
+      <h2 className="text-[26px] font-bold text-[#1A1A1A]">
+        Category & Experts Insights
+      </h2>
+      <div className="flex justify-between items-center">
+        <div className="inline-flex items-center bg-white rounded-[10px] p-1 gap-1 shadow-sm mt-4 mb-6">
           {tabs.map((tab, i) => (
             <Button
               key={tab}
@@ -106,11 +106,11 @@ export default function LeadPerformancePage() {
             </Button>
           ))}
         </div>
-     
+        <CategoriesFilters />
+      </div>
 
       {/* Table */}
       {renderTable(activeTab)}
-
     </div>
   );
 }
