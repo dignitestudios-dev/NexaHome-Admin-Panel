@@ -12,10 +12,12 @@ import Link from "next/link";
 
 import { loginSchema } from "@/lib/schemas/auth.schema";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -28,6 +30,7 @@ export default function LoginForm() {
 
   const onSubmit = (data: LoginFormData) => {
     console.log("LOGIN DATA:", data);
+    router.push("/app/home");
   };
 
   return (
@@ -37,9 +40,7 @@ export default function LoginForm() {
     >
       {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back!
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900">Welcome back!</h1>
         <p className="text-sm text-gray-500 mt-1">
           Enter your details below to login.
         </p>

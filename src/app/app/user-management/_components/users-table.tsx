@@ -34,8 +34,7 @@ export const UsersTable = ({ data }: UsersTableProps) => {
             <TableHead>Email</TableHead>
             <TableHead>Join Date</TableHead>
             <TableHead>User Type</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="rounded-r-3xl">Active / Inactive</TableHead>
+            <TableHead className="rounded-r-3xl">Status</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -81,19 +80,6 @@ export const UsersTable = ({ data }: UsersTableProps) => {
                   }`}
                 >
                   {user.status}
-                </span>
-              </TableCell>
-
-              {/* Active / Inactive Toggle Text */}
-              <TableCell>
-                <span
-                  className={`text-sm font-medium ${
-                    user.status === "Active"
-                      ? "text-[#16BC4E]"
-                      : "text-[#FF0000]"
-                  }`}
-                >
-                  {user.status === "Active" ? "Active" : "Inactive"}
                 </span>
               </TableCell>
             </TableRow>
