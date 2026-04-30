@@ -14,6 +14,7 @@ import DataTable from "./_components/data-table";
 // Icons
 import { Clock, LayoutPanelLeft, UserRound, Filter } from "lucide-react";
 import { LucideIcon } from "lucide-react";
+import { JobsFilters } from "./_components/jobs-filters";
 
 /* ================= TYPES ================= */
 
@@ -52,24 +53,7 @@ const tableData: CategoryRow[] = [
 
 /* ================= COMPONENTS ================= */
 
-const PerformanceFilter = () => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button className="bg-[#005864] hover:bg-[#004750] text-white w-10 h-10 p-0 rounded-lg shadow-sm focus-visible:ring-0 transition-colors">
-        <Filter size={18} />
-      </Button>
-    </DropdownMenuTrigger>
 
-    <DropdownMenuContent
-      align="end"
-      className="w-48 rounded-xl border-none shadow-lg"
-    >
-      <DropdownMenuItem>All Categories</DropdownMenuItem>
-      <DropdownMenuItem>Highest Active</DropdownMenuItem>
-      <DropdownMenuItem>Lowest Active</DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
 
 /* ================= PAGE ================= */
 
@@ -78,7 +62,7 @@ export default function LeadPerformancePage() {
     <div className="min-h-screen font-sans">
       
       {/* Title */}
-      <h1 className="text-[32px] font-bold text-[#1A1A1A] mb-10 tracking-tight">
+      <h1 className="heading">
         Lead Performance Analytics
       </h1>
 
@@ -121,8 +105,8 @@ export default function LeadPerformancePage() {
         <h2 className="text-[26px] font-bold text-[#1A1A1A]">
           Experts Signed Up Per Category
         </h2>
-
-        <PerformanceFilter />
+<JobsFilters />
+      
       </div>
 
       {/* Table */}

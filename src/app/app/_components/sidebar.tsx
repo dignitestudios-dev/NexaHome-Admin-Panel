@@ -43,7 +43,7 @@ const menu = [
   {
     label: "Category & Location Insights",
     icon: Map,
-    link: "/app/category-location-insights",
+    link: "/app/category-location",
   },
   {
     label: "Adv. Category Package",
