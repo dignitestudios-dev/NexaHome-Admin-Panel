@@ -15,6 +15,7 @@ import {
   Megaphone,
   TableProperties,
   ArrowUpToLine,
+  Eye,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -68,11 +69,17 @@ const menu = [
     icon: Megaphone,
     link: "/app/advertising-management",
   },
+   {
+    label: "Job Activity",
+    icon: Eye,
+    link: "/app/job-ativity",
+  },
   {
     label: "Partner Dashboard",
     icon: TableProperties,
     link: "/app/partner-dashboard",
   },
+  
   { label: "CSV Upload", icon: ArrowUpToLine, link: "/app/csv-upload" },
 ];
 

@@ -1,69 +1,99 @@
-import React from "react";
-import { ChevronDown } from "lucide-react";
+import React from "react"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
+
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts"
+
+// Months
 const months = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
+  "Jan","Feb","Mar","Apr","May","Jun",
+  "Jul","Aug","Sep","Oct","Nov","Dec",
+]
 
-// Generate smooth fake dataset (you can replace with API later)
-const generateBars = (count: number) => {
-  return Array.from({ length: count }).map((_, i) => {
-    return Math.sin(i * 0.2) * 20 + 40 + (i % 8) * 4;
-  });
-};
+// Generate smooth dataset
+const data = months.map((month, i) => ({
+  name: month,
+  revenue: Math.sin(i * 0.5) * 200 + 400,
+}))
 
-const barData = generateBars(60);
-
-const RevenueAnalysis: React.FC = () => {
+const RevenueAnalysis = () => {
   return (
-    <div className="lg:col-span-2 rounded-[40px] border-none shadow-sm bg-white p-10 h-[450px] relative overflow-hidden">
+    <Card className="lg:col-span-2 rounded-[40px] border-none shadow-sm h-[450px] p-8">
       
       {/* Header */}
-      <div className="flex justify-between items-center mb-10">
-        <h2 className="text-xl font-bold text-[#1A1A1A]">
+      <CardHeader className="flex flex-row items-center justify-between pb-4">
+        <CardTitle className="text-xl font-bold text-[#1A1A1A]">
           Revenue Analysis
-        </h2>
+        </CardTitle>
 
-        <div className="bg-[#F4F9F9] px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold text-gray-500">
-          Monthly <ChevronDown className="w-4 h-4" />
-        </div>
-      </div>
+        <Select defaultValue="monthly">
+          <SelectTrigger className="w-[120px] h-8 text-xs font-bold bg-[#F4F9F9] border-none">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="daily">Daily</SelectItem>
+            <SelectItem value="weekly">Weekly</SelectItem>
+            <SelectItem value="monthly">Monthly</SelectItem>
+          </SelectContent>
+        </Select>
+      </CardHeader>
 
       {/* Chart */}
-      <div className="flex h-[280px]">
-        
-        {/* Y-Axis */}
-        <div className="flex flex-col justify-between text-[10px] font-bold text-gray-400 pb-8 pr-4">
-          <span>$600</span>
-          <span>$500</span>
-          <span>$400</span>
-          <span>$300</span>
-          <span>$200</span>
-          <span>$100</span>
-          <span>$0</span>
-        </div>
-
-        {/* Bars */}
-        <div className="flex-1 flex items-end gap-[2px] pb-8 relative">
-          {barData.map((height, i) => (
-            <div
-              key={i}
-              className="flex-1 bg-gradient-to-t from-[#0FA3A3]/20 via-[#0FA3A3]/60 to-[#0FA3A3] rounded-t-[2px] transition-all duration-300 hover:opacity-80"
-              style={{ height: `${height}%` }}
+      <CardContent className="h-[320px] px-6">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 600 }}
+              axisLine={false}
+              tickLine={false}
             />
-          ))}
-        </div>
-      </div>
 
-      {/* X-Axis */}
-      <div className="flex justify-between px-10 text-[10px] font-bold text-gray-400">
-        {months.map((m) => (
-          <span key={m}>{m}</span>
-        ))}
-      </div>
-    </div>
-  );
-};
+            <YAxis
+              tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 600 }}
+              axisLine={false}
+              tickLine={false}
+            />
 
-export default RevenueAnalysis;
+            <Tooltip
+              cursor={{ fill: "rgba(15,163,163,0.1)" }}
+              contentStyle={{
+                borderRadius: "12px",
+                border: "none",
+                fontSize: "12px",
+              }}
+            />
+
+            <Bar
+              dataKey="revenue"
+              radius={[4, 4, 0, 0]}
+              fill="#0FA3A3"
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default RevenueAnalysis
