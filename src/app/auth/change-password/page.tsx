@@ -7,7 +7,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { passwordSchema, resetPasswordSchema } from "@/lib/schemas/auth.schema";
 import { z } from "zod";
-import { PasswordUpdatedModal } from "@/components/auth/passwordupdatemodal";
+import { PasswordUpdatedModal } from "./_components/passwordupdatemodal";
+
 
 type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
