@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { PartnerState } from "./_components/partner-state";
+import PartnerDashboard from "./_components/PartnerDashboard";
 
 const PartnerDashboardPage = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <PartnerState />
+      <PartnerDashboard />
     </Suspense>
   );
 };
