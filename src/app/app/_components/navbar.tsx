@@ -17,12 +17,15 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const router = useRouter();
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
 
   const handleLogout = () => {
     console.log("Logout confirmed");
+    router.push("/auth/login");
     setOpenLogoutModal(false);
 
     // 👉 your logout logic here

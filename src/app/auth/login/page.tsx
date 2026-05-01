@@ -30,7 +30,7 @@ export default function LoginForm() {
 
   const onSubmit = (data: LoginFormData) => {
     console.log("LOGIN DATA:", data);
-    router.push("/app/home");
+    router.push("/app/dashboard");
   };
 
   return (
