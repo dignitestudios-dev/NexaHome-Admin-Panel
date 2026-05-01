@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
@@ -18,29 +20,15 @@ import {
   Tooltip,
 } from "recharts";
 
-// Months
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-// Generate smooth dataset
-const data = months.map((month, i) => ({
-  name: month,
-  revenue: Math.sin(i * 0.5) * 200 + 400,
-}));
+import { useRevenueAnalysis } from "@/features/dashboard/dashboard.hooks";
+import type { RevenueGroupBy } from "@/features/dashboard/dashboard.types";
 
 const RevenueAnalysis = () => {
+  const [groupBy, setGroupBy] = useState<RevenueGroupBy>("month");
+  const { data, isLoading, isError, error } = useRevenueAnalysis(groupBy);
+
+  const chartData = data ?? [];
+
   return (
     <Card className="lg:col-span-2 rounded-[40px] border-none shadow-sm h-[450px] px-2 py-8">
       {/* Header */}
@@ -49,47 +37,69 @@ const RevenueAnalysis = () => {
           Revenue Analysis
         </CardTitle>
 
-        <Select defaultValue="monthly">
+        <Select
+          value={groupBy}
+          onValueChange={(value) => setGroupBy(value as RevenueGroupBy)}
+        >
           <SelectTrigger className="w-[120px] h-8 text-xs font-bold bg-[#F4F9F9] border-none">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="daily">Daily</SelectItem>
-            <SelectItem value="weekly">Weekly</SelectItem>
-            <SelectItem value="monthly">Monthly</SelectItem>
+            <SelectItem value="week">Weekly</SelectItem>
+            <SelectItem value="month">Monthly</SelectItem>
+            <SelectItem value="year">Yearly</SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>
 
       {/* Chart */}
       <CardContent className="h-[320px] px-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 600 }}
-              axisLine={false}
-              tickLine={false}
-            />
+        {isError ? (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-600 px-4 py-2 rounded-md text-sm mx-4">
+            ⚠ {(error as Error)?.message ?? "Failed to load revenue analysis."}
+          </div>
+        ) : isLoading ? (
+          <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
+            Loading...
+          </div>
+        ) : chartData.length === 0 ? (
+          <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
+            No revenue data available.
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} barCategoryGap="28%">
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 600 }}
+                axisLine={false}
+                tickLine={false}
+              />
 
-            <YAxis
-              tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 600 }}
-              axisLine={false}
-              tickLine={false}
-            />
+              <YAxis
+                tick={{ fontSize: 10, fill: "#9CA3AF", fontWeight: 600 }}
+                axisLine={false}
+                tickLine={false}
+              />
 
-            <Tooltip
-              cursor={{ fill: "rgba(15,163,163,0.1)" }}
-              contentStyle={{
-                borderRadius: "12px",
-                border: "none",
-                fontSize: "12px",
-              }}
-            />
+              <Tooltip
+                cursor={{ fill: "rgba(15,163,163,0.1)" }}
+                contentStyle={{
+                  borderRadius: "12px",
+                  border: "none",
+                  fontSize: "12px",
+                }}
+              />
 
-            <Bar dataKey="revenue" radius={[4, 4, 0, 0]} fill="#0FA3A3" />
-          </BarChart>
-        </ResponsiveContainer>
+              <Bar
+                dataKey="revenue"
+                radius={[4, 4, 0, 0]}
+                fill="#0FA3A3"
+                maxBarSize={36}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );

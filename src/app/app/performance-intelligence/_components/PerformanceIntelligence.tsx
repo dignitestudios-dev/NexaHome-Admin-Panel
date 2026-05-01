@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-import { Search } from "lucide-react";
-import { FaFilter } from "react-icons/fa";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import SearchInput from "@/components/global/search-input";
@@ -11,46 +8,54 @@ import JobsDataTable from "./jobs-data-table";
 import AreaDataTable from "./area-data-table";
 import HomeOwnersDataTable from "./home-owner-data-table";
 import ExpertDataTable from "./expert-data-table";
-import { AreasFilters } from "./areas-filters";
-import { JobsFilters } from "./jobs-filters";
 
 export default function PerformanceIntelligence() {
   const tabs = ["Top Jobs", "Top Areas", "Top Homeowners", "Top Experts"];
   const searchParams = useSearchParams();
   const router = useRouter();
   const activeTab = searchParams.get("tab") || "Top Jobs";
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const handleTabChange = (tab: string) => {
     router.push(`?tab=${tab}`);
   };
+
   const renderTable = (tab: string) => {
     switch (tab) {
       case "Top Jobs":
         return (
           <div>
-            <JobsDataTable />
+            <JobsDataTable search={debouncedSearch} />
           </div>
         );
 
       case "Top Areas":
         return (
           <div>
-            <AreaDataTable />
+            <AreaDataTable search={debouncedSearch} />
           </div>
         );
 
       case "Top Homeowners":
         return (
           <div>
-            <HomeOwnersDataTable />
+            <HomeOwnersDataTable search={debouncedSearch} />
           </div>
         );
 
       case "Top Experts":
         return (
           <div>
-            <ExpertDataTable />
+            <ExpertDataTable search={debouncedSearch} />
           </div>
         );
     }
@@ -74,13 +79,14 @@ export default function PerformanceIntelligence() {
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <SearchInput />
-          {activeTab === "Top Areas" && <AreasFilters />}
-          {activeTab === "Top Jobs" && <JobsFilters />}
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search"
+          />
         </div>
       </div>
       {renderTable(activeTab)}
-      {/* <Filter open={filterOpen} onClose={() => setFilterOpen(false)} /> */}
     </div>
   );
 }

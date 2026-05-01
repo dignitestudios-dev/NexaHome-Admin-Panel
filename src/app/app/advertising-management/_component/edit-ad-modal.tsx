@@ -1,156 +1,203 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import type { ComponentType } from "react";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogOverlay,
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle2,
+  ExternalLink,
+  ImageIcon,
+  MapPin,
+  Megaphone,
+  Radius,
+  Tag,
+  X,
+} from "lucide-react";
+import {
+  formatAdDuration,
+  formatAdvertisementStatus,
+  getAdCategory,
+  getAdServiceProvider,
+  getAdTargetLocation,
+  getAdvertisementStatusColor,
+  isAdvertisementActive,
+} from "@/features/advertisements/advertisements.api";
+import type { Advertisement } from "@/features/advertisements/advertisements.types";
+import { formatDate } from "@/lib/date";
+import { cn } from "@/lib/utils";
 
 type EditAdModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  adData?: {
-    _id: string;
-    name: string;
-    targetLocation: string;
-    category: string;
-    redirectUrl: string;
-  };
+  ad?: Advertisement | null;
 };
+
+function InfoCell({
+  icon: Icon,
+  label,
+  value,
+  className,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  value: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex items-start gap-3 border-b border-slate-200 p-3.5 last:border-b-0",
+        className
+      )}
+    >
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+      <div className="min-w-0">
+        <p className="text-[12px] text-slate-500">{label}</p>
+        <div className="mt-0.5 break-all text-[13px] font-medium text-slate-900">
+          {value}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function EditAdModal({
   open,
   onOpenChange,
-  adData,
+  ad,
 }: EditAdModalProps) {
-  const [formData, setFormData] = useState({
-    targetLocation: "",
-    service: "",
-    link: "",
-  });
+  if (!ad) return null;
 
-  useEffect(() => {
-    if (adData && open) {
-      setFormData({
-        targetLocation: adData.targetLocation || "",
-        service: adData.category || "",
-        link: adData.redirectUrl || "",
-      });
-    }
-  }, [adData, open]);
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleSave = () => {
-    console.log("Updated form data:", formData);
-    // TODO: Submit to API
-    onOpenChange(false);
-  };
+  const isActive = isAdvertisementActive(ad.status);
+  const mediaUrl = ad.media?.location;
+  const statusLabel = formatAdvertisementStatus(ad.status);
+  const statusColorClass = getAdvertisementStatusColor(ad.status);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
         <DialogOverlay />
 
-        {/* Header Section */}
-        <div className="fixed left-[50%] top-[50%] z-50 w-[490px] translate-x-[-50%] translate-y-[-50%] rounded-[24px] border-0 bg-white p-0 shadow-lg">
-          <div className="relative pt-[35.5px] px-[30px]">
-            <DialogHeader className="mb-[10px]">
-              <DialogTitle className="text-[32px] font-semibold text-[#1C1C1C] leading-[40px] text-left">
-                Edit Ad
+        <div className="fixed left-1/2 top-1/2 z-50 flex w-[min(420px,calc(100vw-2rem))] max-h-[90vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <DialogHeader className="space-y-0">
+              <DialogTitle className="text-[18px] font-semibold text-slate-900">
+                Ad Details
               </DialogTitle>
             </DialogHeader>
-
-            {/* Close Button */}
             <button
+              type="button"
               onClick={() => onOpenChange(false)}
-              className="absolute right-[30px] top-[35.5px] w-[40px] h-[40px] flex items-center justify-center hover:bg-gray-100 rounded-lg transition"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+              aria-label="Close"
             >
-              <X size={20} className="text-[rgba(24,24,24,0.8)]" />
+              <X size={16} />
             </button>
           </div>
 
-          {/* Form Content */}
-          <div className="px-[30px] pb-[16px] mb-2">
-            <div className="mb-[16px]">
-              <div className="w-full h-[220px] rounded-[16px] overflow-hidden bg-black">
-                <video
-                  poster="/images/video-thumbnail.jpg"
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                >
-                  <source
-                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                    type="video/mp4"
-                  />
-                  Your browser does not support the video tag.
-                </video>
+          <div className="flex-1 overflow-y-auto">
+            <div className="overflow-hidden border-b border-slate-200 bg-slate-100">
+              {mediaUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={mediaUrl}
+                  alt={ad.media?.fileName || "Ad media"}
+                  className="aspect-[4/3] w-full object-cover"
+                />
+              ) : (
+                <div className="flex aspect-[4/3] w-full items-center justify-center text-slate-400">
+                  <ImageIcon className="h-10 w-10" />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4 px-5 py-4">
+              <div>
+                <h2 className="text-[18px] font-semibold text-slate-900">
+                  {getAdServiceProvider(ad)}
+                </h2>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {ad.isAdminAd ? (
+                    <span className="inline-flex rounded-md bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-700 ring-1 ring-violet-200">
+                      Admin Ad
+                    </span>
+                  ) : null}
+                  <span className="inline-flex rounded-md bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700 ring-1 ring-sky-200">
+                    {getAdCategory(ad)}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className={cn(
+                  "flex items-center gap-3 rounded-xl border px-3.5 py-2.5",
+                  isActive
+                    ? "border-emerald-200 bg-emerald-50"
+                    : "border-red-200 bg-red-50"
+                )}
+              >
+                <CheckCircle2
+                  className={cn(
+                    "h-4 w-4 shrink-0",
+                    isActive ? "text-emerald-600" : "text-red-500"
+                  )}
+                />
+                <div>
+                  <p className="text-[11px] text-slate-500">Ad Status</p>
+                  <p className={cn("text-[14px] font-semibold", statusColorClass)}>
+                    {statusLabel}
+                  </p>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-xl border border-slate-200">
+                <InfoCell icon={Tag} label="Category" value={getAdCategory(ad)} />
+                <InfoCell
+                  icon={MapPin}
+                  label="Target Location"
+                  value={getAdTargetLocation(ad)}
+                />
+                <InfoCell
+                  icon={Radius}
+                  label="Target Radius"
+                  value={`${ad.targetRadiusMiles} miles`}
+                />
+                <InfoCell
+                  icon={Megaphone}
+                  label="Duration"
+                  value={formatAdDuration(ad.duration)}
+                />
+                <InfoCell
+                  icon={ExternalLink}
+                  label="Redirect Link"
+                  value={
+                    ad.link ? (
+                      <a
+                        href={ad.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#005864] underline-offset-2 hover:underline"
+                      >
+                        {ad.link}
+                      </a>
+                    ) : (
+                      "—"
+                    )
+                  }
+                />
+                <InfoCell
+                  icon={Calendar}
+                  label="Created At"
+                  value={formatDate(ad.createdAt)}
+                />
               </div>
             </div>
-            {/* Target Location */}
-            <div className="flex flex-col gap-[9px] mb-[10px]">
-              <Label className="text-[20px] font-medium leading-[25px] text-[#1C1C1C]">
-                Target Location
-              </Label>
-              <Input
-                value={formData.targetLocation}
-                onChange={(e) =>
-                  handleInputChange("targetLocation", e.target.value)
-                }
-                placeholder="Gardening"
-                className="h-[48px] bg-[rgba(0,88,100,0.14)] border-0 rounded-[12px] px-4 text-[rgba(24,24,24,0.8)]"
-              />
-            </div>
-
-            {/* Service */}
-            <div className="flex flex-col gap-[9px] mb-[10px]">
-              <Label className="text-[20px] font-medium leading-[25px] text-[#1C1C1C]">
-                Service
-              </Label>
-              <Input
-                value={formData.service}
-                onChange={(e) => handleInputChange("service", e.target.value)}
-                placeholder="Gardening"
-                className="h-[48px] bg-[rgba(0,88,100,0.03)] border-0 rounded-[12px] px-4 text-[rgba(24,24,24,0.8)]"
-              />
-            </div>
-
-            {/* Link */}
-            <div className="flex flex-col gap-[9px] mb-[10px]">
-              <Label className="text-[20px] font-medium leading-[25px] text-[#1C1C1C]">
-                Link
-              </Label>
-              <Input
-                value={formData.link}
-                onChange={(e) => handleInputChange("link", e.target.value)}
-                placeholder="https://www.examplelink.io/contact-request"
-                className="h-[48px] bg-[rgba(0,88,100,0.14)] border-0 rounded-[12px] px-4 text-[rgba(24,24,24,0.8)] text-[16px] leading-[20px]"
-              />
-            </div>
-
-            {/* Save Changes Button */}
-            <Button
-              onClick={handleSave}
-              className="w-full h-[48px] bg-[#005864] hover:bg-[#004653] text-white font-semibold text-[16px] leading-[20px] rounded-[12px]"
-            >
-              Save Changes
-            </Button>
           </div>
         </div>
       </DialogPortal>

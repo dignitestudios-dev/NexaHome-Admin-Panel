@@ -54,7 +54,7 @@ export function PasswordUpdatedModal({
         </DialogHeader>
 
        
-        <button
+        {/* <button
           
           onClick={onClose}
           className="w-full mt-6 h-11 bg-[#005864] text-white rounded-xl"
@@ -62,7 +62,7 @@ export function PasswordUpdatedModal({
             <Link href="/auth/login">
           Continue to Login
           </Link>
-        </button>
+        </button> */}
 
       </DialogContent>
     </Dialog>

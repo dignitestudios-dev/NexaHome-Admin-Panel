@@ -19,7 +19,7 @@ export const passwordSchema = z
 /* ---------------- LOGIN ---------------- */
 export const loginSchema = z.object({
   email: emailSchema,
-  password: passwordSchema,
+  password: z.string(),
 });
 
 
@@ -38,10 +38,23 @@ export const otpSchema = z.object({
 /* ---------------- RESET PASSWORD ---------------- */
 export const resetPasswordSchema = z
   .object({
-    password: passwordSchema,
-    confirmPassword: passwordSchema,
+    password: z.string().trim(),
+    confirmPassword: z.string().trim(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      });
+      return;
+    }
+
+    const result = passwordSchema.safeParse(data.password);
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        ctx.addIssue({ ...issue, path: ["password"] });
+      }
+    }
   });

@@ -1,53 +1,52 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import SearchInput from "@/components/global/search-input";
 import DailyAdsTable from "./dailyads-table";
 import { AdsFilters } from "./ads-filters";
-import { Plus } from "lucide-react";
+import {
+  ADVERTISEMENT_TABS,
+  normalizeAdvertisementTab,
+} from "@/features/advertisements/advertisements.api";
+import type {
+  AdvertisementStatusFilter,
+  AdvertisementTab,
+} from "@/features/advertisements/advertisements.types";
 
 const AdvertisingManagement = () => {
-  const tabs = ["Daily Ads", "Weekly Ads", "Monthly Ads", "Admin Ads"];
   const searchParams = useSearchParams();
   const router = useRouter();
-  const activeTab = searchParams.get("tab") || "Daily Ads";
+  const activeTab = normalizeAdvertisementTab(searchParams.get("tab"));
+  const [search, setSearch] = useState(searchParams.get("search") ?? "");
+  const [debouncedSearch, setDebouncedSearch] = useState(
+    searchParams.get("search")?.trim() ?? ""
+  );
+  const [status, setStatus] = useState<AdvertisementStatusFilter>("all");
+  const [page, setPage] = useState(1);
 
-  const handleTabChange = (tab: string) => {
-    router.push(`?tab=${tab}`);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab, debouncedSearch, status]);
+
+  const handleTabChange = (tab: AdvertisementTab) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.push(`?${params.toString()}`);
   };
 
   const handleCreateAd = () => {
     router.push("/app/advertising-management/create-ad");
-  };
-  const renderTable = (tab: string) => {
-    switch (tab) {
-      case "Daily Ads":
-        return (
-          <div>
-            <DailyAdsTable />
-          </div>
-        );
-
-      case "Weekly Ads":
-        return (
-          <div>
-            <DailyAdsTable />
-          </div>
-        );
-
-      case "Monthly Ads":
-        return (
-          <div>
-            <DailyAdsTable />
-          </div>
-        );
-
-      case "Admin Ads":
-        return (
-          <div>
-            <DailyAdsTable />
-          </div>
-        );
-    }
   };
 
   return (
@@ -55,38 +54,49 @@ const AdvertisingManagement = () => {
       <div className="flex justify-between py-4">
         <h1 className="heading">Advertising Management</h1>
         <div className="flex items-center gap-2">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search ads"
+          />
+          <AdsFilters
+            value={status}
+            onApply={(nextStatus) => setStatus(nextStatus)}
+          />
           <Button
             onClick={handleCreateAd}
             variant="default"
             className="w-[141px] h-[48px] rounded-[16px] px-[10px] py-[10px] flex flex-row justify-center items-center gap-[10px] leading-[18px]"
           >
-            {" "}
             <span>
               <Plus />
-            </span>{" "}
+            </span>
             Create Ad
           </Button>
-          <AdsFilters />
         </div>
       </div>
       <div className="flex justify-between py-4">
-        <div className="inline-flex items-center bg-white rounded-[10px] p-1 gap-1 ">
-          {tabs.map((tab, i) => (
+        <div className="inline-flex items-center bg-white rounded-[10px] p-1 gap-1">
+          {ADVERTISEMENT_TABS.map((tab) => (
             <Button
-              key={tab}
-              onClick={() => handleTabChange(tab)}
-              className={`
-            w-[152px] ${activeTab !== tab && "bg-white text-[#181818CC]"}
-            
-          `}
+              key={tab.value}
+              onClick={() => handleTabChange(tab.value)}
+              className={`w-[152px] ${
+                activeTab !== tab.value && "bg-white text-[#181818CC]"
+              }`}
             >
-              {tab}
+              {tab.label}
             </Button>
           ))}
         </div>
       </div>
-      {renderTable(activeTab)}
-      {/* <Filter open={filterOpen} onClose={() => setFilterOpen(false)} /> */}
+      <DailyAdsTable
+        tab={activeTab}
+        search={debouncedSearch}
+        status={status}
+        page={page}
+        onPageChange={setPage}
+      />
     </div>
   );
 };

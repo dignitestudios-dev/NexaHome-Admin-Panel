@@ -60,7 +60,10 @@ export default function CustomSelect({
       </div>
 
       <SelectContent
-        position="item-aligned"
+        position="popper"
+        side="bottom"
+        align="start"
+        sideOffset={4}
         className="w-[var(--radix-select-trigger-width)] rounded-xl border-none shadow-md"
       >
         {options.map((item) => (

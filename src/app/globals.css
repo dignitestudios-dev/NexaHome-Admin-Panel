@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,6 +49,7 @@
 }
 
 :root {
+  --font-plus-jakarta-sans-fallback: ui-sans-serif, system-ui, sans-serif;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -121,16 +122,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, sans-serif;
   }
-  html {
-    @apply font-sans;
-  }
-}
-
-body {
-  font-family: var(--font-plus-jakarta-sans), sans-serif;
 }
 
 .heading {
@@ -174,4 +170,51 @@ body {
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.popular-categories-scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.popular-categories-scroll-hidden::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.popular-categories-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 88, 100, 0.35) transparent;
+}
+
+.popular-categories-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.popular-categories-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.popular-categories-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 88, 100, 0.35);
+  border-radius: 999px;
+}
+
+.pac-container {
+  z-index: 10000 !important;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  margin-top: 4px;
+  font-family: inherit;
+}
+
+.pac-item {
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.pac-item:hover {
+  background-color: #f8fafc;
 }

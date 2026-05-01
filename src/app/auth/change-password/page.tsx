@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { passwordSchema, resetPasswordSchema } from "@/lib/schemas/auth.schema";
+import { resetPasswordSchema } from "@/lib/schemas/auth.schema";
 import { z } from "zod";
 import { PasswordUpdatedModal } from "./_components/passwordupdatemodal";
+import { useUpdatePassword } from "@/features/auth/auth.hooks";
+import { clearResetFlow, getResetToken } from "@/lib/auth-session";
+import { useRouter } from "next/navigation";
 
 
 type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
@@ -15,7 +18,9 @@ type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 export default function ChangePasswordPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const updatePassword = useUpdatePassword();
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -25,13 +30,33 @@ const [passwordUpdated, setPasswordUpdated] = useState(false);
   });
 
   const onSubmit = (data: ResetPasswordSchema) => {
-    console.log("PASSWORD DATA:", data);
-    // alert("Password updated successfully!");
-    setPasswordUpdated(true);
+    updatePassword.mutate(
+      { resetToken: getResetToken(), password: data.password },
+      {
+        onSuccess: () => {
+          clearResetFlow();
+          setPasswordUpdated(true);
+
+          setTimeout(() => {
+            router.push("/auth/login");
+          }, 3000);
+        },
+      }
+    );
   };
 
   return (
-    <div className="flex w-full min-h-screen font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="relative flex w-full min-h-screen">
+
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={() => router.push("/auth/forgot-password")}
+        className="absolute top-8 left-8 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-[#F0F5F6] text-[#181818] hover:bg-[#e2eced] transition"
+        aria-label="Go back"
+      >
+        <ArrowLeft size={20} />
+      </button>
 
       {/* ─── RIGHT PANEL ─── */}
       <div className="flex-1 bg-white flex items-center justify-center px-8 py-16">
@@ -111,12 +136,20 @@ const [passwordUpdated, setPasswordUpdated] = useState(false);
             )}
           </div>
 
+          {/* API error */}
+          {updatePassword.isError && (
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-600 px-4 py-2 rounded-md text-sm mb-4">
+              ⚠ {(updatePassword.error as Error)?.message ?? "Could not update password."}
+            </div>
+          )}
+
           {/* Button */}
           <button
             type="submit"
-            className="w-full h-12 bg-[#005864] text-white font-semibold rounded-xl"
+            disabled={updatePassword.isPending}
+            className="w-full h-12 bg-[#005864] text-white font-semibold rounded-xl disabled:opacity-60"
           >
-            Update Password
+            {updatePassword.isPending ? "Updating..." : "Update Password"}
           </button>
 
         </form>

@@ -17,16 +17,33 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { useMe, useLogout } from "@/features/auth/auth.hooks";
+
+function getInitials(name?: string) {
+  if (!name) return "NA";
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 export default function Navbar() {
+  const router = useRouter();
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
+  const { data: admin, isLoading } = useMe();
+  const logout = useLogout();
 
   const handleLogout = () => {
-    console.log("Logout confirmed");
-    setOpenLogoutModal(false);
-
-    // 👉 your logout logic here
-    // e.g. clear token, redirect, etc.
+    logout.mutate(undefined, {
+      onSettled: () => {
+        setOpenLogoutModal(false);
+        router.push("/auth/login");
+      },
+    });
   };
 
   return (
@@ -40,19 +57,25 @@ export default function Navbar() {
           <DropdownMenuTrigger asChild>
             <div className="flex items-center gap-3 cursor-pointer">
               <Avatar className="w-9 h-9">
-                <AvatarImage src="https://i.pravatar.cc/150?img=12" />
-                <AvatarFallback>RC</AvatarFallback>
+                <AvatarImage src={admin?.profilePicture?.location} />
+                <AvatarFallback>{getInitials(admin?.name)}</AvatarFallback>
               </Avatar>
               <span className="text-sm font-medium text-gray-700">
-                Ryan Cooper
+                {isLoading ? "Loading..." : admin?.name ?? "Admin"}
               </span>
             </div>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
             align="end"
-            className="w-[160px] rounded-xl shadow-md"
+            className="w-[180px] rounded-xl shadow-md"
           >
+            <DropdownMenuItem
+              onClick={() => router.push("/app/profile")}
+              className="cursor-pointer"
+            >
+              View Profile
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setOpenLogoutModal(true)}
               className="cursor-pointer text-red-600"
@@ -78,16 +101,24 @@ export default function Navbar() {
           <div className="flex gap-3 mt-4">
             <button
               onClick={() => setOpenLogoutModal(false)}
-              className="flex-1 py-2 rounded-[10px] bg-gray-200 text-sm font-medium"
+              disabled={logout.isPending}
+              className="flex-1 py-2 rounded-[10px] bg-gray-200 text-sm font-medium disabled:opacity-60"
             >
               Cancel
             </button>
 
             <button
               onClick={handleLogout}
-              className="flex-1 py-2 rounded-[10px] bg-[#d42d2d] text-white text-sm font-medium"
+              disabled={logout.isPending}
+              className="flex-1 py-2 rounded-[10px] bg-[#d42d2d] text-white text-sm font-medium disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              Logout
+              {logout.isPending ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" /> Logging out...
+                </>
+              ) : (
+                "Logout"
+              )}
             </button>
           </div>
         </DialogContent>

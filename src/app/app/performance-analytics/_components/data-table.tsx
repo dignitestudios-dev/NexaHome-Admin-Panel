@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,68 +9,80 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Pagination from "@/components/global/pagination";
+import { useTopCategoriesByExperts } from "@/features/insights/insights.hooks";
 
-export default function DataTable() {
-  const [loading] = useState(false);
+type DataTableProps = {
+  search?: string;
+};
 
-  // ✅ Updated data (category-based like your previous table)
-  const categories = [
-    { id: "1", category: "Window Cleaning", total: 98, active: 56 },
-    { id: "2", category: "Plumbing Services", total: 87, active: 61 },
-    { id: "3", category: "Electrical Services", total: 76, active: 49 },
-    { id: "4", category: "Handyman Services", total: 65, active: 42 },
-    { id: "5", category: "Pest Control", total: 59, active: 38 },
-    { id: "6", category: "Appliance Repair", total: 52, active: 33 },
-    { id: "7", category: "Roofing Services", total: 48, active: 29 },
-    { id: "8", category: "Pressure Washing", total: 41, active: 25 },
-    { id: "9", category: "Gutter Services", total: 36, active: 21 },
-    { id: "10", category: "Painting Services", total: 30, active: 18 },
-  ];
+const ITEMS_PER_PAGE = 10;
+
+export default function DataTable({ search = "" }: DataTableProps) {
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isError, error } = useTopCategoriesByExperts({
+    page,
+    limit: ITEMS_PER_PAGE,
+    search,
+  });
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
+
+  const categories = data?.categories ?? [];
+  const totalPages = data?.totalPages ?? 1;
+
+  const handlePrev = () => {
+    setPage((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleNext = () => {
+    setPage((prev) => Math.min(totalPages, prev + 1));
+  };
 
   return (
     <div>
       <div className="overflow-hidden">
         <Table>
-          {/* HEADER */}
           <TableHeader>
             <TableRow>
               <TableHead className="rounded-l-3xl">Category</TableHead>
-              <TableHead className="text-center">
-                Total Experts
-              </TableHead>
               <TableHead className="text-right rounded-r-3xl">
-                Active Experts
+                Experts Signed Up
               </TableHead>
             </TableRow>
           </TableHeader>
 
-          {/* BODY */}
           <TableBody>
-            {loading ? (
+            {isLoading ? (
               <TableRow>
-                <TableCell colSpan={3} className="h-24 text-center">
-                  Loading...
+                <TableCell colSpan={2} className="h-24 text-center">
+                  <div className="flex items-center justify-center">
+                    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
+                    <span className="ml-2">Loading...</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={2} className="h-24 text-center text-red-600">
+                  {(error as Error)?.message ??
+                    "Failed to load categories by experts."}
                 </TableCell>
               </TableRow>
             ) : categories.length ? (
               categories.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">
-                    {item.category}
-                  </TableCell>
-
-                  <TableCell className="text-center">
-                    {item.total}
-                  </TableCell>
-
+                <TableRow key={item.categoryId}>
+                  <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell className="text-right font-semibold">
-                    {item.active}
+                    {item.expertsCount}
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} className="h-24 text-center">
+                <TableCell colSpan={2} className="h-24 text-center">
                   No categories found.
                 </TableCell>
               </TableRow>
@@ -78,6 +90,15 @@ export default function DataTable() {
           </TableBody>
         </Table>
       </div>
+
+      {!isLoading && !isError && categories.length > 0 && (
+        <Pagination
+          currentPage={data?.page ?? page}
+          totalPages={totalPages}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
+      )}
     </div>
   );
 }

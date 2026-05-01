@@ -1,7 +1,7 @@
 "use client";
 
 import Pagination from "@/components/global/pagination";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -10,139 +10,121 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import {
+  formatReportRevenue,
+  getReportProfileImageUrl,
+  getReportUserInitials,
+} from "@/features/reports/reports.api";
+import { useReportsUsers } from "@/features/reports/reports.hooks";
+import { formatDate } from "@/lib/date";
 
-export default function DataTable() {
-  const [loading] = useState(false);
-  const [page, setPage] = useState<number>(1);
-  const totalPages = 5;
+type DataTableProps = {
+  page: number;
+  startDate?: string;
+  endDate?: string;
+  onPageChange: (page: number) => void;
+};
+
+const ITEMS_PER_PAGE = 10;
+
+export default function DataTable({
+  page,
+  startDate,
+  endDate,
+  onPageChange,
+}: DataTableProps) {
+  const { data, isLoading, isError, error } = useReportsUsers({
+    page,
+    limit: ITEMS_PER_PAGE,
+    startDate,
+    endDate,
+  });
+
+  const users = data?.users ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   const handlePrev = () => {
-    if (page > 1) setPage((prev) => prev - 1);
+    if (page > 1) onPageChange(page - 1);
   };
 
   const handleNext = () => {
-    if (page < totalPages) setPage((prev) => prev + 1);
+    if (page < totalPages) onPageChange(page + 1);
   };
-  const usersData = [
-    {
-      name: "Ali Khan",
-      email: "ali.khan@gmail.com",
-      joinDate: "12-05-2023",
-      jobPost: 12,
-      revenueGenerated: 450.0,
-    },
-    {
-      name: "Sara Ahmed",
-      email: "sara.ahmed@yahoo.com",
-      joinDate: "11-03-2022",
-      jobPost: 25,
-      revenueGenerated: 980.25,
-    },
-    {
-      name: "Usman Tariq",
-      email: "usman.tariq@hotmail.com",
-      joinDate: "01-20-2024",
-      jobPost: 8,
-      revenueGenerated: 210.75,
-    },
-    {
-      name: "Ayesha Malik",
-      email: "ayesha.malik@gmail.com",
-      joinDate: "07-15-2023",
-      jobPost: 18,
-      revenueGenerated: 6700.5,
-    },
-    {
-      name: "Bilal Hussain",
-      email: "bilal.hussain@outlook.com",
-      joinDate: "09-28-2021",
-      jobPost: 30,
-      revenueGenerated: 1200.0,
-    },
-    {
-      name: "Hina Sheikh",
-      email: "hina.sheikh@gmail.com",
-      joinDate: "03-10-2022",
-      jobPost: 15,
-      revenueGenerated: 5400.25,
-    },
-    {
-      name: "Farhan Ali",
-      email: "farhan.ali@yahoo.com",
-      joinDate: "02-05-2024",
-      jobPost: 5,
-      revenueGenerated: 150.75,
-    },
-    {
-      name: "Zainab Iqbal",
-      email: "zainab.iqbal@gmail.com",
-      joinDate: "10-22-2023",
-      jobPost: 20,
-      revenueGenerated: 720.5,
-    },
-  ];
-  const getStatusColor = (status: string) => {
-    return status === "Active" ? "text-green-600" : "text-red-500";
-  };
+
   return (
     <div>
-      <div className=" rounded-3xl overflow-hidden ">
-        <Table className="">
-          {/* HEADER */}
-          <TableHeader className="  ">
-            <TableRow className="">
-              <TableHead className=" rounded-l-3xl   ">User Name</TableHead>
+      <div className="rounded-3xl overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="rounded-l-3xl">User Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Join Date</TableHead>
               <TableHead>Job Post</TableHead>
-              <TableHead className=" rounded-r-3xl ">
-                Revenue Generated
-              </TableHead>
+              <TableHead className="rounded-r-3xl">Revenue Generated</TableHead>
             </TableRow>
           </TableHeader>
 
-          {/* BODY */}
-          <TableBody className="">
-            {loading ? (
-              <TableRow className="">
-                <TableCell className="h-24 text-center">
+          <TableBody>
+            {isError ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center text-red-600">
+                  ⚠ {(error as Error)?.message ?? "Failed to load reports."}
+                </TableCell>
+              </TableRow>
+            ) : isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
                   <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                     <span className="ml-2">Loading...</span>
                   </div>
                 </TableCell>
               </TableRow>
-            ) : usersData.length ? (
-              usersData.map((user, index) => (
-                <TableRow key={index} className="">
-                  <TableCell className="font-medium  ">{user.name}</TableCell>
-
-                  <TableCell className="capitalize">{user.email}</TableCell>
-
-                  <TableCell>{user.joinDate}</TableCell>
-
-                  <TableCell>{user.jobPost}</TableCell>
-
-                  <TableCell>${user.revenueGenerated}</TableCell>
+            ) : users.length ? (
+              users.map((user) => (
+                <TableRow key={user.userId}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-10 w-10 rounded-full">
+                        <AvatarImage
+                          src={getReportProfileImageUrl(user)}
+                          alt={user.userName}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className="rounded-full bg-[#005864] text-white text-[11px] font-medium">
+                          {getReportUserInitials(user.userName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{user.userName}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{formatDate(user.joinDate)}</TableCell>
+                  <TableCell>{user.jobsPosted}</TableCell>
+                  <TableCell>
+                    {formatReportRevenue(user.revenueGenerated)}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
-                  No job categories found.
+                <TableCell colSpan={5} className="h-24 text-center">
+                  No reports found.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
 
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPrev={handlePrev}
-          onNext={handleNext}
-        />
+        {!isLoading && !isError && users.length > 0 && (
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPrev={handlePrev}
+            onNext={handleNext}
+          />
+        )}
       </div>
     </div>
   );

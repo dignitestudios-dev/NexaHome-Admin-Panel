@@ -1,57 +1,74 @@
+"use client";
+
 import React from "react";
 import {
   TrendingUp,
-  Users,
-  DollarSign,
-  ShoppingCart,
+  TrendingDown,
   Briefcase,
   UserStar,
   User,
 } from "lucide-react";
 
-type StatItem = {
+import { useDashboardSummary } from "@/features/dashboard/dashboard.hooks";
+import type { MetricStat } from "@/features/dashboard/dashboard.types";
+
+type StatConfig = {
   title: string;
-  value: string | number;
   icon: React.ElementType;
-  trend?: string;
+  key: "totalUsers" | "totalExperts" | "totalJobsPosted" | "totalRevenue";
+  isCurrency?: boolean;
 };
 
-const stats: StatItem[] = [
-  {
-    title: "Total Users",
-    value: "12,430",
-    icon: User,
-    trend: "8% increase this month",
-  },
-  {
-    title: "Total Experts",
-    value: "32,000",
-    icon: UserStar,
-    trend: "5% increase this month",
-  },
-  {
-    title: "Total Jobs Posted",
-    value: "1,240",
-    icon: Briefcase,
-    trend: "10% increase this month",
-  },
-  {
-    title: "Total Revenue",
-    value: "56,876",
-    icon: TrendingUp,
-    trend: "12% increase this month",
-  },
+const statsConfig: StatConfig[] = [
+  { title: "Total Users", icon: User, key: "totalUsers" },
+  { title: "Total Experts", icon: UserStar, key: "totalExperts" },
+  { title: "Total Jobs Posted", icon: Briefcase, key: "totalJobsPosted" },
+  { title: "Total Revenue", icon: TrendingUp, key: "totalRevenue", isCurrency: true },
 ];
 
+function formatValue(value: number, isCurrency?: boolean) {
+  const formatted = new Intl.NumberFormat("en-US").format(value);
+  return isCurrency ? `$ ${formatted}` : formatted;
+}
+
+function normalizeGrowthPercent(value?: number) {
+  if (value == null || Number.isNaN(value) || !Number.isFinite(value)) {
+    return 0;
+  }
+  return value;
+}
+
+function formatTrend(stat?: MetricStat) {
+  if (!stat) return "0% increase this month";
+
+  const pct = normalizeGrowthPercent(stat.increasePercentThisMonth);
+  const direction = pct < 0 ? "decrease" : "increase";
+  return `${Math.abs(pct)}% ${direction} this month`;
+}
+
 const Metrics = () => {
+  const { data, isLoading, isError, error } = useDashboardSummary();
+
+  if (isError) {
+    return (
+      <div className="bg-red-50 border-l-4 border-red-500 text-red-600 px-4 py-3 rounded-md text-sm mb-8">
+        ⚠ {(error as Error)?.message ?? "Failed to load dashboard summary."}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      {stats.map((item, i) => {
+      {statsConfig.map((item) => {
         const Icon = item.icon;
+        const stat = data?.[item.key];
+        const isNegative =
+          normalizeGrowthPercent(stat?.increasePercentThisMonth) < 0;
+        const TrendIcon = isNegative ? TrendingDown : TrendingUp;
 
         return (
           <div
-            key={i}
+            key={item.key}
             className="border-none shadow-sm rounded-[32px] overflow-hidden bg-white"
           >
             <div className="p-0">
@@ -63,16 +80,20 @@ const Metrics = () => {
 
                 <div>
                   <p className="text-[13px] font-medium ">{item.title}</p>
-                  <h2 className="text-[26px] font-semibold tracking-tight">
-                    {item.value}
-                  </h2>
+                  {isLoading ? (
+                    <div className="h-8 w-20 bg-gray-100 rounded-md animate-pulse mt-1" />
+                  ) : (
+                    <h2 className="text-[26px] font-semibold tracking-tight">
+                      {formatValue(stat?.value ?? 0, item.isCurrency)}
+                    </h2>
+                  )}
                 </div>
               </div>
 
               {/* Bottom Section */}
               <div className="bg-[#005864] py-3 px-8 flex items-center gap-2 text-white font-light text-[13px]">
-                <TrendingUp className="w-5 h-5" />
-                {item.trend}
+                <TrendIcon className="w-5 h-5" />
+                {isLoading ? "Loading..." : formatTrend(stat)}
               </div>
             </div>
           </div>

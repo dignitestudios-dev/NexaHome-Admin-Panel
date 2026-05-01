@@ -22,7 +22,6 @@ import {
 
 import { CgClose } from "react-icons/cg";
 
-import { FaFilter } from "react-icons/fa";
 
 import { useState } from "react";
 
@@ -58,8 +57,8 @@ export function LeadFilter() {
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
-  <Button className="bg-[#005864] hover:bg-[#004750] text-white w-10 h-10 p-0 rounded-lg shadow-sm focus-visible:ring-0 transition-colors">
-    <FaFilter className="w-[18px] h-[18px]" />
+  <Button className="bg-[#005864] hover:bg-[#004750] text-white h-10 px-4 rounded-lg shadow-sm focus-visible:ring-0 transition-colors">
+    Filter
   </Button>
 </DrawerTrigger>
 

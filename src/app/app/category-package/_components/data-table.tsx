@@ -1,7 +1,7 @@
 "use client";
 
+import { useState } from "react";
 import Pagination from "@/components/global/pagination";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,146 +10,184 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { Eye } from "lucide-react";
+import {
+  formatSubscriptionStatus,
+  getSubscriptionCategoryName,
+  getSubscriptionCompanyName,
+  getSubscriptionPurchaseDate,
+  getSubscriptionUserId,
+} from "@/features/category-subscriptions/category-subscriptions.api";
+import { useCategorySubscriptions } from "@/features/category-subscriptions/category-subscriptions.hooks";
+import type { SubscriptionStatusFilter } from "@/features/category-subscriptions/category-subscriptions.types";
+import { formatDate } from "@/lib/date";
+import { ExpertDetailsModal } from "./expert-details-modal";
 
-export default function DataTable() {
-  const [loading] = useState(false);
-  const [page, setPage] = useState<number>(1);
-  const totalPages = 5;
+type DataTableProps = {
+  page: number;
+  search: string;
+  status?: SubscriptionStatusFilter;
+  onPageChange: (page: number) => void;
+};
+
+const ITEMS_PER_PAGE = 10;
+
+const actionButtonClass =
+  "inline-flex h-9 w-9 items-center justify-center rounded-full transition";
+
+function getStatusColor(status: string) {
+  const normalized = status.toLowerCase();
+  if (normalized === "active") return "text-[#16BC4E]";
+  if (
+    normalized === "canceled" ||
+    normalized === "cancelled" ||
+    normalized === "inactive"
+  ) {
+    return "text-[#FF0000]";
+  }
+  return "text-slate-600";
+}
+
+export default function DataTable({
+  page,
+  search,
+  status,
+  onPageChange,
+}: DataTableProps) {
+  const [selectedExpertId, setSelectedExpertId] = useState<string | null>(null);
+  const [selectedPurchaseDate, setSelectedPurchaseDate] = useState<
+    string | null
+  >(null);
+
+  const { data, isLoading, isError, error } = useCategorySubscriptions({
+    page,
+    limit: ITEMS_PER_PAGE,
+    search: search || undefined,
+    status,
+  });
+
+  const subscriptions = data?.subscriptions ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   const handlePrev = () => {
-    if (page > 1) setPage((prev) => prev - 1);
+    if (page > 1) onPageChange(page - 1);
   };
 
   const handleNext = () => {
-    if (page < totalPages) setPage((prev) => prev + 1);
+    if (page < totalPages) onPageChange(page + 1);
   };
-  const usersData = [
-    {
-      id: 1,
-      name: "Jack Martian",
-      category: "Window Cleaning+",
-      date: "09/02/2025",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Jack Martian",
-      category: "Window Cleaning+",
-      date: "09/02/2025",
-      status: "Inactive",
-    },
-    {
-      id: 3,
-      name: "Sarah Johnson",
-      category: "Gutter Cleaning+",
-      date: "09/03/2025",
-      status: "Active",
-    },
-    {
-      id: 4,
-      name: "Michael Lee",
-      category: "Power Washing+",
-      date: "09/04/2025",
-      status: "Active",
-    },
-    {
-      id: 5,
-      name: "Emily Davis",
-      category: "Pressure Washing+",
-      date: "09/05/2025",
-      status: "Inactive",
-    },
-    {
-      id: 6,
-      name: "Chris Brown",
-      category: "Roof Cleaning+",
-      date: "09/06/2025",
-      status: "Active",
-    },
-    {
-      id: 7,
-      name: "Laura Wilson",
-      category: "Carpet Cleaning+",
-      date: "09/07/2025",
-      status: "Inactive",
-    },
-    {
-      id: 8,
-      name: "Robert Smith",
-      category: "Home Cleaning+",
-      date: "09/08/2025",
-      status: "Active",
-    },
-    {
-      id: 9,
-      name: "Jessica Taylor",
-      category: "Office Cleaning+",
-      date: "09/09/2025",
-      status: "Active",
-    },
-  ];
-  const getStatusColor = (status: string) => {
-    return status === "Active" ? "text-green-600" : "text-red-500";
-  };
+
   return (
-    <div>
-      <div className=" rounded-3xl overflow-hidden ">
-        <Table className="">
-          {/* HEADER */}
-          <TableHeader className="  ">
-            <TableRow className="">
-              <TableHead className=" rounded-l-3xl   ">User Name</TableHead>
-              <TableHead className="  ">Category Purchased</TableHead>
-              <TableHead className="   ">Purchase Date</TableHead>
-              <TableHead className=" rounded-r-3xl ">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          {/* BODY */}
-          <TableBody className="">
-            {loading ? (
-              <TableRow className="">
-                <TableCell className="h-24 text-center">
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    <span className="ml-2">Loading...</span>
-                  </div>
-                </TableCell>
+    <>
+      <div>
+        <div className="rounded-3xl overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="rounded-l-3xl">Company Name</TableHead>
+                <TableHead>Category Purchased</TableHead>
+                <TableHead>Purchase Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="rounded-r-3xl text-center">Action</TableHead>
               </TableRow>
-            ) : usersData.length ? (
-              usersData.map((user) => (
-                <TableRow key={user.id} className="">
-                  <TableCell className="font-medium  ">{user.name}</TableCell>
+            </TableHeader>
 
-                  <TableCell className="capitalize">{user.category}</TableCell>
-
-                  <TableCell>{user.date}</TableCell>
-
+            <TableBody>
+              {isError ? (
+                <TableRow>
                   <TableCell
-                    className={`font-semibold ${getStatusColor(user.status)}`}
+                    colSpan={5}
+                    className="h-24 text-center text-red-600"
                   >
-                    {user.status}
+                    ⚠{" "}
+                    {(error as Error)?.message ??
+                      "Failed to load subscriptions."}
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
-                  No job categories found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ) : isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                      <span className="ml-2">Loading...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : subscriptions.length ? (
+                subscriptions.map((subscription) => {
+                  const displayStatus = formatSubscriptionStatus(
+                    subscription.status
+                  );
+                  const expertId = getSubscriptionUserId(subscription);
 
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPrev={handlePrev}
-          onNext={handleNext}
-        />
+                  return (
+                    <TableRow key={subscription._id}>
+                      <TableCell className="font-medium">
+                        {getSubscriptionCompanyName(subscription)}
+                      </TableCell>
+                      <TableCell className="capitalize">
+                        {getSubscriptionCategoryName(subscription)}
+                      </TableCell>
+                      <TableCell>
+                        {formatDate(getSubscriptionPurchaseDate(subscription))}
+                      </TableCell>
+                      <TableCell
+                        className={`font-semibold ${getStatusColor(subscription.status)}`}
+                      >
+                        {displayStatus}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-center">
+                          <button
+                            type="button"
+                            disabled={!expertId}
+                            onClick={() => {
+                              if (!expertId) return;
+                              setSelectedExpertId(expertId);
+                              setSelectedPurchaseDate(
+                                getSubscriptionPurchaseDate(subscription) ?? null
+                              );
+                            }}
+                            className={`${actionButtonClass} bg-[#F0F5F6] text-[#005864] hover:bg-[#e2eced] disabled:cursor-not-allowed disabled:opacity-50`}
+                            aria-label={`View ${getSubscriptionCompanyName(subscription)}`}
+                          >
+                            <Eye size={18} />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    No category subscriptions found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+
+          {!isLoading && !isError && subscriptions.length > 0 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPrev={handlePrev}
+              onNext={handleNext}
+            />
+          )}
+        </div>
       </div>
-    </div>
+
+      <ExpertDetailsModal
+        open={!!selectedExpertId}
+        expertId={selectedExpertId}
+        purchaseDate={selectedPurchaseDate}
+        onClose={() => {
+          setSelectedExpertId(null);
+          setSelectedPurchaseDate(null);
+        }}
+      />
+    </>
   );
 }

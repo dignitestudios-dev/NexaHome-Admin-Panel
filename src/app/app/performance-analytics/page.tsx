@@ -1,13 +1,24 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import SearchInput from "@/components/global/search-input";
 import DataTable from "./_components/data-table";
 import Stats from "./_components/stats";
-import { LeadFilter } from "./_components/lead-filter";
 
 /* ================= PAGE ================= */
 
 export default function LeadPerformancePage() {
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   return (
     <div className="min-h-screen font-sans">
       {/* Title */}
@@ -24,12 +35,15 @@ export default function LeadPerformancePage() {
           Experts Signed Up Per Category
         </h2>
 
-        {/* Replaced PerformanceFilter (Dropdown) with LeadFilter (Drawer) */}
-        <LeadFilter />
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Search category"
+        />
       </div>
 
       {/* Table */}
-      <DataTable />
+      <DataTable search={debouncedSearch} />
     </div>
   );
 }

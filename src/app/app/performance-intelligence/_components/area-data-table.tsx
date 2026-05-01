@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,88 +8,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Pagination from "@/components/global/pagination";
+import { useTopLocations } from "@/features/insights/insights.hooks";
 
-export default function AreaDataTable() {
-  // ✅ dummy loading
-  const [loading] = useState(false);
-  const [page, setPage] = useState<number>(1);
-  const totalPages = 5;
+function formatRank(index: number) {
+  return String(index + 1).padStart(2, "0");
+}
 
-  const handlePrev = () => {
-    if (page > 1) setPage((prev) => prev - 1);
-  };
+function formatRevenue(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
 
-  const handleNext = () => {
-    if (page < totalPages) setPage((prev) => prev + 1);
-  };
-
-  // ✅ dummy data
-  const jobCategories = [
-    {
-      _id: "1",
-      rank: "01",
-      name: "Baby Sitting",
-      totalRequests: 98,
-      revenueGenerated: "$45,897",
-    },
-    {
-      _id: "2",
-      rank: "02",
-      name: "House Cleaning",
-      totalRequests: 76,
-      revenueGenerated: "$32,450",
-    },
-    {
-      _id: "3",
-      rank: "03",
-      name: "Pet Care",
-      totalRequests: 65,
-      revenueGenerated: "$28,900",
-    },
-    {
-      _id: "4",
-      rank: "04",
-      name: "Gardening",
-      totalRequests: 54,
-      revenueGenerated: "$24,100",
-    },
-    {
-      _id: "5",
-      rank: "05",
-      name: "Cooking",
-      totalRequests: 43,
-      revenueGenerated: "$19,750",
-    },
-    {
-      _id: "6",
-      rank: "06",
-      name: "Elderly Care",
-      totalRequests: 38,
-      revenueGenerated: "$17,200",
-    },
-    {
-      _id: "7",
-      rank: "07",
-      name: "Tutoring",
-      totalRequests: 32,
-      revenueGenerated: "$14,500",
-    },
-    {
-      _id: "8",
-      rank: "08",
-      name: "Personal Training",
-      totalRequests: 28,
-      revenueGenerated: "$12,800",
-    },
-    {
-      _id: "9",
-      rank: "09",
-      name: "Event Planning",
-      totalRequests: 24,
-      revenueGenerated: "$11,200",
-    },
-  ];
+export default function AreaDataTable({ search = "" }: { search?: string }) {
+  const { data: locations = [], isLoading, isError, error } =
+    useTopLocations(10, search);
 
   return (
     <div className="">
@@ -111,49 +44,42 @@ export default function AreaDataTable() {
 
           {/* BODY */}
           <TableBody className="">
-            {loading ? (
+            {isError ? (
+              <TableRow>
+                <TableCell colSpan={4} className="h-24 text-center text-red-600">
+                  ⚠ {(error as Error)?.message ?? "Failed to load top areas."}
+                </TableCell>
+              </TableRow>
+            ) : isLoading ? (
               <TableRow className="">
-                <TableCell className="h-24 text-center">
+                <TableCell colSpan={4} className="h-24 text-center">
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     <span className="ml-2">Loading...</span>
                   </div>
                 </TableCell>
               </TableRow>
-            ) : jobCategories.length ? (
-              jobCategories.map((category) => (
-                <TableRow key={category._id} className="">
-                  <TableCell className="font-medium  ">
-                    {category.rank}
-                  </TableCell>
-
-                  <TableCell className="capitalize">{category.name}</TableCell>
-
-                  <TableCell>{category.totalRequests}</TableCell>
-
-                  <TableCell className="font-semibold ">
-                    {category.revenueGenerated}
+            ) : locations.length ? (
+              locations.map((location, index) => (
+                <TableRow key={location.state} className="">
+                  <TableCell className="font-medium">{formatRank(index)}</TableCell>
+                  <TableCell className="capitalize">{location.state}</TableCell>
+                  <TableCell>{location.totalJobs}</TableCell>
+                  <TableCell className="font-semibold">
+                    {formatRevenue(location.revenue)}
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell colSpan={4} className="h-24 text-center">
-                  No job categories found.
+                  No locations found.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-
-      {/* PAGINATION (STATIC UI) */}
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages}
-        onPrev={handlePrev}
-        onNext={handleNext}
-      />
     </div>
   );
 }

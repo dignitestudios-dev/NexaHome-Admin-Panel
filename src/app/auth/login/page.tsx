@@ -13,12 +13,14 @@ import Link from "next/link";
 import { loginSchema } from "@/lib/schemas/auth.schema";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { useLogin } from "@/features/auth/auth.hooks";
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const login = useLogin();
 
   const {
     register,
@@ -29,8 +31,16 @@ export default function LoginForm() {
   });
 
   const onSubmit = (data: LoginFormData) => {
-    console.log("LOGIN DATA:", data);
-    router.push("/app/home");
+    login.mutate(data, {
+      onSuccess: () => {
+        const redirectTo = new URLSearchParams(window.location.search).get(
+          "redirect"
+        );
+        router.push(
+          redirectTo?.startsWith("/app") ? redirectTo : "/app/dashboard"
+        );
+      },
+    });
   };
 
   return (
@@ -100,12 +110,20 @@ export default function LoginForm() {
         </Link>
       </div>
 
+      {/* API error */}
+      {login.isError && (
+        <div className="bg-red-50 border-l-4 border-red-500 text-red-600 px-4 py-2 rounded-md text-sm mb-3">
+          ⚠ {(login.error as Error)?.message ?? "Login failed. Try again."}
+        </div>
+      )}
+
       {/* Button */}
       <Button
         type="submit"
-        className="w-full h-12 bg-[#005864] hover:opacity-90 active:scale-95 rounded-xl"
+        disabled={login.isPending}
+        className="w-full h-12 bg-[#005864] hover:opacity-90 active:scale-95 rounded-xl disabled:opacity-60"
       >
-        Continue
+        {login.isPending ? "Logging in..." : "Continue"}
       </Button>
     </form>
   );

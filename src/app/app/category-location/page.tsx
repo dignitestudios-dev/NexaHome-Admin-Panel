@@ -152,45 +152,116 @@
 "use client";
 
 import React from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
 import { DataTable } from "./_components/data-table";
+import { useTopCategoriesByExperts } from "@/features/insights/insights.hooks";
+import { usePopularCategories } from "@/features/dashboard/dashboard.hooks";
+import { useTopLocations } from "@/features/insights/insights.hooks";
 
-const categoryStats = [
-  { rank: 1, name: "Pressure Washing", count: 10000 },
-  { rank: 1, name: "Outdoor Living", count: 10000 },
-  { rank: 1, name: "Pest Control", count: 10000 },
-  { rank: 1, name: "Painting Services", count: 10000 },
-  { rank: 1, name: "Gutter Services", count: 10000 },
-  { rank: 1, name: "Window Cleaning", count: 10000 },
-];
-
-const barChartData = [
-  { rank: "1", name: "David", count: 5.6 },
-  { rank: "2", name: "Michael", count: 4.8 },
-  { rank: "3", name: "Mike", count: 4.2 },
-  { rank: "4", name: "Max", count: 3.9 },
-  { rank: "5", name: "David", count: 3.2 },
-  { rank: "6", name: "Mike", count: 2.5 },
-];
-
-const tableData = Array(5).fill({
-  area: "ABC Area",
-  totalJobs: 98,
-  demand: 45897,
-});
+const LOCATIONS_PER_PAGE = 10;
 
 export default function InsightsPage() {
+  const [locationsPage, setLocationsPage] = useState(1);
+  const {
+    data: popularCategoriesData,
+    isLoading: isPopularCategoriesLoading,
+    isError: isPopularCategoriesError,
+    error: popularCategoriesError,
+  } = usePopularCategories();
+  const { data: categoriesByExpertsData } = useTopCategoriesByExperts({
+    page: 1,
+    limit: 10,
+  });
+  const categoriesByExperts = categoriesByExpertsData?.categories ?? [];
+  const {
+    data: topLocations = [],
+    isLoading: isTopLocationsLoading,
+    isError: isTopLocationsError,
+    error: topLocationsError,
+  } = useTopLocations();
+  const tableData = topLocations.map((location) => ({
+    area: location.state,
+    totalJobs: location.totalJobs,
+    demand: location.revenue,
+  }));
+  const totalLocationPages = Math.max(
+    1,
+    Math.ceil(tableData.length / LOCATIONS_PER_PAGE)
+  );
+  const paginatedLocations = tableData.slice(
+    (locationsPage - 1) * LOCATIONS_PER_PAGE,
+    locationsPage * LOCATIONS_PER_PAGE
+  );
+  const popularCategories = (popularCategoriesData?.categories ?? []).slice(0, 6);
+  const maxPopularCategoryCount = popularCategories.reduce(
+    (max, item) => Math.max(max, item.jobsCount),
+    0
+  );
+  const topExpertCategories = [...categoriesByExperts]
+    .sort((a, b) => b.expertsCount - a.expertsCount)
+    .slice(0, 4);
+  const barChartData = topExpertCategories.map((item, index) => ({
+    rank: String(index + 1),
+    name: item.name,
+    count: item.expertsCount,
+  }));
+  const yAxisMax = Math.max(
+    5,
+    ...barChartData.map((item) => Math.ceil(item.count))
+  );
+
+  const renderExpertsCategoryTick = ({
+    x,
+    y,
+    payload,
+  }: {
+    x?: string | number;
+    y?: string | number;
+    payload?: { value?: string | number };
+  }) => {
+    const item = barChartData.find(
+      (entry) => String(entry.rank) === String(payload?.value ?? ""),
+    );
+
+    return (
+      <g transform={`translate(${Number(x) || 0},${Number(y) || 0})`}>
+        <text
+          x={0}
+          y={0}
+          dy={14}
+          textAnchor="middle"
+          fill="#777"
+          fontSize={12}
+          fontWeight={600}
+        >
+          {payload?.value}
+        </text>
+        <text
+          x={0}
+          y={0}
+          dy={30}
+          textAnchor="middle"
+          fill="#777"
+          fontSize={9}
+        >
+          {item?.name ?? ""}
+        </text>
+      </g>
+    );
+  };
+
   return (
     <div className=" space-y-6  min-h-screen">
       <h1 className="text-3xl font-bold text-[#1A1A1A]">
         Category & Location Insights
       </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Popular Categories */}
-        <Card className="border-none shadow-none rounded-[32px] bg-white p-6">
+        <Card className="border-none shadow-none rounded-[32px] bg-white p-6 lg:col-span-5">
           <CardHeader className="p-0  flex flex-row items-center justify-between">
             <CardTitle className="text-[16px] font-bold">
               Popular Categories
@@ -200,27 +271,63 @@ export default function InsightsPage() {
             </span>
           </CardHeader>
           <CardContent className="p-0 space-y-4">
-            {categoryStats.map((item, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between items-center text-[13px] font-semibold">
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 flex items-center justify-center rounded-md bg-[#00515C] text-white text-[10px]">
-                      {item.rank}
-                    </span>
-                    <span className="text-[#333333]">{item.name}</span>
+            {isPopularCategoriesLoading
+              ? Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-[14px] w-full bg-gray-100 rounded-full animate-pulse" />
                   </div>
-                  <span className="text-[#00707E]">
-                    {item.count.toLocaleString()}
-                  </span>
-                </div>
-                <div className="h-[14px] w-full bg-gradient-to-r from-[#00515C] to-[#00A7BA] rounded-full" />
-              </div>
-            ))}
+                ))
+              : null}
+
+            {!isPopularCategoriesLoading && isPopularCategoriesError ? (
+              <p className="text-sm text-red-600">
+                {(popularCategoriesError as Error)?.message ??
+                  "Failed to load categories."}
+              </p>
+            ) : null}
+
+            {!isPopularCategoriesLoading &&
+            !isPopularCategoriesError &&
+            popularCategories.length === 0 ? (
+              <p className="text-sm text-gray-400">No categories found.</p>
+            ) : null}
+
+            {!isPopularCategoriesLoading &&
+              !isPopularCategoriesError &&
+              popularCategories.map((item, index) => {
+                const percentage =
+                  maxPopularCategoryCount > 0
+                    ? (item.jobsCount / maxPopularCategoryCount) * 100
+                    : 0;
+
+                return (
+                  <div key={item._id} className="space-y-2">
+                    <div className="flex justify-between items-center text-[13px] font-semibold">
+                      <div className="flex items-center gap-3">
+                        <span className="w-6 h-6 flex items-center justify-center rounded-md bg-[#00515C] text-white text-[10px]">
+                          {index + 1}
+                        </span>
+                        <span className="text-[#333333]">{item.name}</span>
+                      </div>
+                      <span className="text-[#00707E]">
+                        {item.jobsCount.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="h-[14px] w-full bg-[#D1E6E9] rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-[#00515C] to-[#00A7BA]"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
           </CardContent>
         </Card>
 
         {/* Experts Chart */}
-        <Card className="border-none shadow-none rounded-[28px] bg-white p-6">
+        <Card className="border-none shadow-none rounded-[28px] bg-white p-6 lg:col-span-7">
           <CardHeader className="p-0 mb-6">
             <CardTitle className="text-[16px] font-bold text-[#1A1A1A]">
               Experts Per Category
@@ -231,11 +338,11 @@ export default function InsightsPage() {
               config={{
                 count: { label: "Count", color: "hsl(var(--primary))" },
               }}
-              className="h-[280px] w-full"
+              className="h-[320px] w-full"
             >
               <BarChart
                 data={barChartData}
-                margin={{ top: 20, right: 0, left: -20, bottom: -10 }}
+                margin={{ top: 20, right: 12, left: -10, bottom: 28 }}
               >
                 <CartesianGrid
                   vertical={false}
@@ -246,14 +353,15 @@ export default function InsightsPage() {
                   dataKey="rank"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 12, fill: "#777" }}
+                  interval={0}
+                  height={48}
+                  tick={renderExpertsCategoryTick}
                 />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
                   tick={{ fontSize: 12, fill: "#777" }}
-                  domain={[0, 6]}
-                  ticks={[0, 1, 2, 3, 4, 5, 6]}
+                  domain={[0, yAxisMax]}
                 />
                 <Bar
                   dataKey="count"
@@ -261,7 +369,6 @@ export default function InsightsPage() {
                   radius={[8, 8, 0, 0]}
                   barSize={20}
                 />
-                {/* Define the vertical gradient */}{" "}
                 <defs>
                   <linearGradient
                     id="colorGradient"
@@ -275,21 +382,24 @@ export default function InsightsPage() {
                   </linearGradient>
                 </defs>
               </BarChart>
-            </ChartContainer>{" "}
-            {/* Custom Legend - Expert Names */}
-            <div className="flex justify-between items-center text-xs text-[#777] font-medium pt-3 px-12">
-              {barChartData.map((expert, idx) => (
-                <p key={idx} className="whitespace-nowrap">
-                  {expert.name}
-                </p>
-              ))}
-            </div>
+            </ChartContainer>
           </CardContent>
         </Card>
       </div>
 
       {/* Separated Table Component Call */}
-      <DataTable data={tableData} />
+      <DataTable
+        data={paginatedLocations}
+        currentPage={locationsPage}
+        totalPages={totalLocationPages}
+        onPrevPage={() => setLocationsPage((prev) => Math.max(1, prev - 1))}
+        onNextPage={() =>
+          setLocationsPage((prev) => Math.min(totalLocationPages, prev + 1))
+        }
+        isLoading={isTopLocationsLoading}
+        isError={isTopLocationsError}
+        errorMessage={(topLocationsError as Error)?.message}
+      />
     </div>
   );
 }

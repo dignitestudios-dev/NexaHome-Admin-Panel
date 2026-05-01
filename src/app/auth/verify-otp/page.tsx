@@ -1,17 +1,30 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { otpSchema } from "@/lib/schemas/auth.schema";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { useVerifyOtp, useForgotPassword } from "@/features/auth/auth.hooks";
+import { getResetEmail } from "@/lib/auth-session";
 
 type OtpFormData = z.infer<typeof otpSchema>;
 
 export default function VerificationPage() {
+  const router = useRouter();
+  const verifyOtp = useVerifyOtp();
+  const resendOtp = useForgotPassword();
+  const [email, setEmail] = useState("");
   const [timer, setTimer] = useState(30);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  // Email was stored on the forgot-password step.
+  useEffect(() => {
+    setEmail(getResetEmail());
+  }, []);
 
   const {
     setValue,
@@ -72,8 +85,17 @@ export default function VerificationPage() {
   };
 
   const handleSubmitOtp = (data: OtpFormData) => {
-    console.log("OTP SUBMIT:", data);
-    window.location.href = "/auth/change-password";
+    verifyOtp.mutate(
+      { email, otp: data.otp },
+      {
+        onSuccess: () => router.push("/auth/change-password"),
+      }
+    );
+  };
+
+  const handleResend = () => {
+    if (!email) return;
+    resendOtp.mutate({ email }, { onSuccess: () => setTimer(30) });
   };
 
   useEffect(() => {
@@ -86,8 +108,18 @@ export default function VerificationPage() {
   return (
     <form
       onSubmit={handleSubmit(handleSubmitOtp)}
-      className="w-full min-h-screen flex items-center justify-center px-6"
+      className="relative w-full min-h-screen flex items-center justify-center px-6"
     >
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="absolute top-8 left-8 flex items-center justify-center w-10 h-10 rounded-full bg-[#F0F5F6] text-[#181818] hover:bg-[#e2eced] transition"
+        aria-label="Go back"
+      >
+        <ArrowLeft size={20} />
+      </button>
+
       <div className="w-full max-w-md text-center">
         <h1 className="text-[36px] font-semibold text-[#181818]">
           Verification
@@ -95,7 +127,7 @@ export default function VerificationPage() {
 
         <p className="text-[16px] text-gray-500 mt-2">
           Enter the code sent to{" "}
-          <span className="text-[#005864]">lucasbenjamin@gmail.com</span>
+          <span className="text-[#005864]">{email || "your email"}</span>
         </p>
 
         {/* OTP Inputs */}
@@ -126,13 +158,23 @@ export default function VerificationPage() {
           </div>
         )}
 
+        {/* API error */}
+        {verifyOtp.isError && (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-600 px-4 py-2 rounded-md text-sm mt-2">
+            ⚠ {(verifyOtp.error as Error)?.message ?? "Invalid OTP."}
+          </div>
+        )}
+
         <p className="text-[16px] text-gray-500 mt-5">
           Didn’t receive code?{" "}
           <button
             type="button"
-            disabled={timer > 0}
+            onClick={handleResend}
+            disabled={timer > 0 || resendOtp.isPending}
             className={`text-[#005864] ${
-              timer > 0 ? "opacity-50 cursor-not-allowed" : "hover:underline"
+              timer > 0 || resendOtp.isPending
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:underline"
             }`}
           >
             {timer > 0 ? `Resend OTP in ${timer}s` : "Resend OTP"}
@@ -141,9 +183,10 @@ export default function VerificationPage() {
 
         <Button
           type="submit"
-          className="w-full h-14 mt-8 bg-[#005864] rounded-xl"
+          disabled={verifyOtp.isPending}
+          className="w-full h-14 mt-8 bg-[#005864] rounded-xl disabled:opacity-60"
         >
-          Verify
+          {verifyOtp.isPending ? "Verifying..." : "Verify"}
         </Button>
       </div>
     </form>
