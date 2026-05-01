@@ -131,9 +131,7 @@ export default function DailyAdsTable() {
                 <TableRow key={ad._id} className="">
                   <TableCell className="capitalize">{ad.name}</TableCell>
                   <TableCell>{ad.addType}</TableCell>
-                  <TableCell className="font-semibold ">
-                    {ad.category}
-                  </TableCell>
+                  <TableCell className=" ">{ad.category}</TableCell>
                   <TableCell>{ad.targetLocation}</TableCell>
                   <TableCell>{ad.duration}</TableCell>
                   <TableCell>

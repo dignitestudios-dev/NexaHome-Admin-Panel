@@ -58,25 +58,20 @@ const Metrics = () => {
               {/* Top Section */}
               <div className="p-4 flex items-center gap-5">
                 <div className="bg-[#E6EEEE] p-5 rounded-2xl">
-                  <Icon
-                    className="w-8 h-8 text-[#004D4D]"
-                    strokeWidth={2.5}
-                  />
+                  <Icon className="w-8 h-8 text-[#004D4D]" strokeWidth={2.5} />
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">
-                    {item.title}
-                  </p>
-                  <h2 className="text-2xl font-black text-[#1A1A1A] tracking-tight">
+                  <p className="text-[13px] font-medium ">{item.title}</p>
+                  <h2 className="text-[26px] font-semibold tracking-tight">
                     {item.value}
                   </h2>
                 </div>
               </div>
 
               {/* Bottom Section */}
-              <div className="bg-[#005864] py-3 px-8 flex items-center gap-2 text-white font-medium text-sm">
-                <TrendingUp className="w-4 h-4" />
+              <div className="bg-[#005864] py-3 px-8 flex items-center gap-2 text-white font-light text-[13px]">
+                <TrendingUp className="w-5 h-5" />
                 {item.trend}
               </div>
             </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Pagination from "@/components/global/pagination";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -12,8 +13,18 @@ import {
 import { useState } from "react";
 
 export default function DataTable() {
-    const [loading] = useState(false);
-   const usersData = [
+  const [loading] = useState(false);
+  const [page, setPage] = useState<number>(1);
+  const totalPages = 5;
+
+  const handlePrev = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
+  const usersData = [
     {
       id: 1,
       name: "Jack Martian",
@@ -79,10 +90,8 @@ export default function DataTable() {
     },
   ];
   const getStatusColor = (status: string) => {
-  return status === "Active"
-    ? "text-green-600"
-    : "text-red-500";
-};
+    return status === "Active" ? "text-green-600" : "text-red-500";
+  };
   return (
     <div>
       <div className=" rounded-3xl overflow-hidden ">
@@ -117,7 +126,11 @@ export default function DataTable() {
 
                   <TableCell>{user.date}</TableCell>
 
-                  <TableCell className={`font-semibold ${getStatusColor(user.status)}`}>{user.status}</TableCell>
+                  <TableCell
+                    className={`font-semibold ${getStatusColor(user.status)}`}
+                  >
+                    {user.status}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -130,31 +143,12 @@ export default function DataTable() {
           </TableBody>
         </Table>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between py-4 space-y-2 sm:space-y-0">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm">Items per page:</span>
-
-            <select value={10} className="border rounded px-2 py-1 text-sm">
-              {[5, 10, 20, 50].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-
-            <span className="text-sm font-medium">Page 1 of 1</span>
-
-            <Button variant="outline" size="sm" disabled>
-              Next
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
       </div>
     </div>
   );

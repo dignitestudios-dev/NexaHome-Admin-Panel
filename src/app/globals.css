@@ -129,6 +129,10 @@
   }
 }
 
+body {
+  font-family: var(--font-plus-jakarta-sans), sans-serif;
+}
+
 .heading {
   @apply text-[36px] font-bold tracking-[-0.82px];
 }

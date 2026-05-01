@@ -1,12 +1,7 @@
-import React from "react"
-import { ChevronDown } from "lucide-react"
+import React from "react";
+import { ChevronDown } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
   Select,
@@ -14,7 +9,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 import {
   BarChart,
@@ -24,7 +19,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   CartesianGrid,
-} from "recharts"
+} from "recharts";
 
 const growthData = [
   { month: "Jan", users: 40, experts: 20 },
@@ -33,17 +28,14 @@ const growthData = [
   { month: "Apr", users: 60, experts: 35 },
   { month: "May", users: 80, experts: 50 },
   { month: "Jun", users: 75, experts: 48 },
-]
+];
 
 const GrowthTracking = () => {
   return (
-    <Card className="rounded-[40px] p-4 border-none shadow-sm h-[400px] flex flex-col">
-      
+    <Card className="rounded-[40px] py-6 border-none shadow-sm h-[400px] flex flex-col">
       {/* Header */}
       <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <CardTitle className="text-xl font-bold text-[#1A1A1A]">
-          Growth Tracking
-        </CardTitle>
+        <CardTitle className="text-[16px] font-bold">Growth Tracking</CardTitle>
 
         <Select defaultValue="monthly">
           <SelectTrigger className="w-[120px] h-8 text-xs font-bold bg-[#EFF7F8] border-none">
@@ -58,7 +50,6 @@ const GrowthTracking = () => {
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col">
-
         {/* Legend */}
         <div className="flex gap-4 mb-6">
           <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
@@ -73,12 +64,8 @@ const GrowthTracking = () => {
         <div className="flex-1">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={growthData} barGap={6}>
-              
               {/* Grid (matches your subtle lines) */}
-              <CartesianGrid
-                vertical={false}
-                stroke="#F3F4F6"
-              />
+              <CartesianGrid vertical={false} stroke="#F3F4F6" />
 
               <XAxis
                 dataKey="month"
@@ -113,13 +100,12 @@ const GrowthTracking = () => {
                 radius={[10, 10, 0, 0]}
                 barSize={10}
               />
-
             </BarChart>
           </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
 export default GrowthTracking;

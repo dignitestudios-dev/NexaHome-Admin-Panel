@@ -25,7 +25,6 @@ const Stats = () => {
             className="w-[270px] h-[100px] border-none shadow-none rounded-[24px] bg-white flex items-center"
           >
             <div className="p-4 flex items-center gap-4 w-full">
-              
               {/* Icon */}
               <div className="bg-[#EAF1F2] w-[68px] h-[68px] rounded-[24px] flex items-center justify-center shrink-0">
                 <Icon
@@ -40,11 +39,10 @@ const Stats = () => {
                 <p className="text-[13px] font-medium text-[#333333] whitespace-nowrap overflow-hidden text-ellipsis">
                   {item.title}
                 </p>
-                <h2 className="text-[28px] font-bold text-black leading-none whitespace-nowrap">
+                <h2 className="text-[28px] font-semibold text-black leading-none whitespace-nowrap">
                   {item.value}
                 </h2>
               </div>
-
             </div>
           </div>
         );

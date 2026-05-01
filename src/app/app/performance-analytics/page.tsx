@@ -10,21 +10,17 @@ import { LeadFilter } from "./_components/lead-filter";
 export default function LeadPerformancePage() {
   return (
     <div className="min-h-screen font-sans">
-      
       {/* Title */}
-      <h1 className="heading">
-        Lead Performance Analytics
-      </h1>
+      <h1 className="heading">Lead Performance Analytics</h1>
 
       {/* Stats */}
-      <div className="flex flex-wrap gap-6 mb-12 ">
-        <Stats/>
+      <div className="flex flex-wrap gap-6 my-6 ">
+        <Stats />
       </div>
-  
 
       {/* Section Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-[26px] font-bold text-[#1A1A1A]">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-[24px] font-semibold text-[#1A1A1A]">
           Experts Signed Up Per Category
         </h2>
 
@@ -33,8 +29,7 @@ export default function LeadPerformancePage() {
       </div>
 
       {/* Table */}
-      <DataTable/>
-
+      <DataTable />
     </div>
   );
 }

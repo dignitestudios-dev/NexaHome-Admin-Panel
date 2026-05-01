@@ -55,7 +55,7 @@ const CategoriesPage = () => {
             variant="outline"
             size="sm"
             onClick={() => setIsModalOpen(true)}
-            className="w-[141px] h-[38px] bg-white border border-0 rounded-[12px] px-[10px] py-[10px] flex flex-row justify-center items-center gap-[10px] text-[#005864] font-semibold text-[14px] leading-[18px] hover:bg-white"
+            className="w-[141px] h-[38px] bg-white border border-0 shadow-none rounded-[12px] px-[10px] py-[10px] flex flex-row justify-center items-center gap-[10px] text-[#005864] font-semibold text-[14px] leading-[18px] hover:bg-white"
           >
             <span>+</span> Add Category
           </Button>

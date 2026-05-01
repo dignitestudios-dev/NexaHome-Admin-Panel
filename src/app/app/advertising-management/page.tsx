@@ -31,14 +31,26 @@ const AdvertisingManagementPage = () => {
           </div>
         );
 
-      // case "Top Areas":
-      //   return <div><AreaDataTable /></div>;
+      case "Weekly Ads":
+        return (
+          <div>
+            <DailyAdsTable />
+          </div>
+        );
 
-      // case "Top Homeowners":
-      //   return <div><HomeOwnersDataTable /></div>;
+      case "Monthly Ads":
+        return (
+          <div>
+            <DailyAdsTable />
+          </div>
+        );
 
-      // case "Top Experts":
-      //   return <div><ExpertDataTable /></div>;
+      case "Admin Ads":
+        return (
+          <div>
+            <DailyAdsTable />
+          </div>
+        );
     }
   };
   return (
@@ -61,7 +73,7 @@ const AdvertisingManagementPage = () => {
         </div>
       </div>
       <div className="flex justify-between py-4">
-        <div className="inline-flex items-center bg-white rounded-[10px] p-1 gap-1 shadow-sm">
+        <div className="inline-flex items-center bg-white rounded-[10px] p-1 gap-1 ">
           {tabs.map((tab, i) => (
             <Button
               key={tab}

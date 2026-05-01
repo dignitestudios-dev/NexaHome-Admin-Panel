@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Pagination from "@/components/global/pagination";
 
 // Updated dummy data to match image_f26a76.png
 const jobData = [
@@ -55,6 +56,17 @@ const jobData = [
 export default function InprogressTable() {
   const [loading] = useState(false);
 
+  const [page, setPage] = useState<number>(1);
+  const totalPages = 5;
+
+  const handlePrev = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
+
   return (
     <div className="w-full">
       <div className="rounded-[24px] overflow-hidden">
@@ -62,12 +74,24 @@ export default function InprogressTable() {
           {/* HEADER STYLE MATCHING image_f26a76.png */}
           <TableHeader className="border-none">
             <TableRow className="border-none hover:bg-transparent">
-              <TableHead className="py-6 px-6 font-semibold text-[#1A1A1A] rounded-l-3xl">Job ID</TableHead>
-              <TableHead className="py-6 font-semibold text-[#1A1A1A]">Job Category</TableHead>
-              <TableHead className="py-6 font-semibold text-[#1A1A1A]">Posted By</TableHead>
-              <TableHead className="py-6 font-semibold text-[#1A1A1A]">Vendor Assigned</TableHead>
-              <TableHead className="py-6 font-semibold text-[#1A1A1A]">Job Status</TableHead>
-              <TableHead className="py-6 px-6 font-semibold text-[#1A1A1A] rounded-r-3xl">Date Posted</TableHead>
+              <TableHead className="py-6 px-6 font-semibold text-[#1A1A1A] rounded-l-3xl">
+                Job ID
+              </TableHead>
+              <TableHead className="py-6 font-semibold text-[#1A1A1A]">
+                Job Category
+              </TableHead>
+              <TableHead className="py-6 font-semibold text-[#1A1A1A]">
+                Posted By
+              </TableHead>
+              <TableHead className="py-6 font-semibold text-[#1A1A1A]">
+                Vendor Assigned
+              </TableHead>
+              <TableHead className="py-6 font-semibold text-[#1A1A1A]">
+                Job Status
+              </TableHead>
+              <TableHead className="py-6 px-6 font-semibold text-[#1A1A1A] rounded-r-3xl">
+                Date Posted
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -75,12 +99,15 @@ export default function InprogressTable() {
             {loading ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
-                   Loading...
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : jobData.length ? (
               jobData.map((job) => (
-                <TableRow key={job._id} className="border-b border-gray-100 hover:bg-gray-50/50">
+                <TableRow
+                  key={job._id}
+                  className="border-b border-gray-100 hover:bg-gray-50/50"
+                >
                   <TableCell className="py-6 px-6 font-medium text-[#1A1A1A]">
                     {job.jobId}
                   </TableCell>
@@ -96,7 +123,9 @@ export default function InprogressTable() {
                         <AvatarImage src={job.postedBy.avatar} />
                         <AvatarFallback>JM</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium text-[#1A1A1A]">{job.postedBy.name}</span>
+                      <span className="font-medium text-[#1A1A1A]">
+                        {job.postedBy.name}
+                      </span>
                     </div>
                   </TableCell>
 
@@ -107,13 +136,21 @@ export default function InprogressTable() {
                         <AvatarImage src={job.vendor.avatar} />
                         <AvatarFallback>JM</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium text-[#1A1A1A]">{job.vendor.name}</span>
+                      <span className="font-medium text-[#1A1A1A]">
+                        {job.vendor.name}
+                      </span>
                     </div>
                   </TableCell>
 
                   {/* CONDITIONAL STATUS COLOR */}
                   <TableCell className="py-6 font-bold">
-                    <span className={job.status === "Active" ? "text-[#22C55E]" : "text-[#EF4444]"}>
+                    <span
+                      className={
+                        job.status === "Active"
+                          ? "text-[#22C55E]"
+                          : "text-[#EF4444]"
+                      }
+                    >
                       {job.status}
                     </span>
                   </TableCell>
@@ -135,20 +172,12 @@ export default function InprogressTable() {
       </div>
 
       {/* PAGINATION UI */}
-      <div className="flex flex-col sm:flex-row items-center justify-between py-6">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-500">Items per page:</span>
-          <select className="border-none bg-gray-100 rounded-lg px-2 py-1 text-sm font-medium">
-            <option>10</option>
-          </select>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" className="text-gray-400">Previous</Button>
-          <span className="text-sm font-semibold">Page 1 of 1</span>
-          <Button variant="ghost" size="sm" className="text-teal-600 font-bold">Next</Button>
-        </div>
-      </div>
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPrev={handlePrev}
+        onNext={handleNext}
+      />
     </div>
   );
 }

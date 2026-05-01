@@ -8,5 +8,5 @@ export default function Home() {
   //   redirect("/dashboard");
   // }
 
-  redirect("/auth/dashboard");
+  redirect("/app/dashboard");
 }

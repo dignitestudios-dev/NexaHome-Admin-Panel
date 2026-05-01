@@ -121,7 +121,7 @@
 //           <h2 className="text-2xl font-semibold text-[#1A1A1A]">Top Areas By Job Activity</h2>
 //           <a href="#" className="text-sm font-semibold text-[#00515C] hover:underline">View All</a>
 //         </div>
-        
+
 //         <div className="rounded-[28px] bg-white overflow-hidden p-6">
 //           <Table>
 //             <TableHeader>
@@ -149,15 +149,13 @@
 
 // export default InsightsDashboard;
 
+"use client";
 
-
-"use client"
-
-import React from 'react';
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
-import {DataTable} from "./_components/data-table";
+import { DataTable } from "./_components/data-table";
 
 const categoryStats = [
   { rank: 1, name: "Pressure Washing", count: 10000 },
@@ -185,15 +183,21 @@ const tableData = Array(5).fill({
 
 export default function InsightsPage() {
   return (
-    <div className=" space-y-12  min-h-screen">
-      <h1 className="text-3xl font-bold text-[#1A1A1A]">Category & Location Insights</h1>
+    <div className=" space-y-6  min-h-screen">
+      <h1 className="text-3xl font-bold text-[#1A1A1A]">
+        Category & Location Insights
+      </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Popular Categories */}
         <Card className="border-none shadow-none rounded-[32px] bg-white p-6">
           <CardHeader className="p-0  flex flex-row items-center justify-between">
-            <CardTitle className="text-[16px] font-bold">Popular Categories</CardTitle>
-            <span className="text-[13px] font-bold text-[#1A1A1A]">Lead Count</span>
+            <CardTitle className="text-[16px] font-bold">
+              Popular Categories
+            </CardTitle>
+            <span className="text-[13px] font-bold text-[#1A1A1A]">
+              Lead Count
+            </span>
           </CardHeader>
           <CardContent className="p-0 space-y-4">
             {categoryStats.map((item, index) => (
@@ -205,7 +209,9 @@ export default function InsightsPage() {
                     </span>
                     <span className="text-[#333333]">{item.name}</span>
                   </div>
-                  <span className="text-[#00707E]">{item.count.toLocaleString()}</span>
+                  <span className="text-[#00707E]">
+                    {item.count.toLocaleString()}
+                  </span>
                 </div>
                 <div className="h-[14px] w-full bg-gradient-to-r from-[#00515C] to-[#00A7BA] rounded-full" />
               </div>
@@ -215,28 +221,68 @@ export default function InsightsPage() {
 
         {/* Experts Chart */}
         <Card className="border-none shadow-none rounded-[28px] bg-white p-6">
-           <CardHeader className="p-0 mb-6">
-             <CardTitle className="text-xl font-semibold text-[#1A1A1A]">Experts Per Category</CardTitle>
-           </CardHeader>
-           <CardContent className="p-0">
-             <ChartContainer config={{ count: { label: "Count", color: "hsl(var(--primary))" } }} className="h-[280px] w-full">
-                 <BarChart data={barChartData} margin={{ top: 20, right: 0, left: -20, bottom: -10 }}>
-                     <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#e0e0e0" />
-                     <XAxis dataKey="rank" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#777" }} />
-                     <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#777" }} domain={[0, 6]} ticks={[0, 1, 2, 3, 4, 5, 6]} />
-                    <Bar dataKey="count" fill="url(#colorGradient)" radius={[8, 8, 0, 0]} barSize={20} />
-                    {/* Define the vertical gradient */}                 <defs>
-                    <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#00515C" />
-                           <stop offset="100%" stopColor="#00A7BA" />
-                       </linearGradient>
-                 </defs>
-                </BarChart>
-           </ChartContainer>            {/* Custom Legend - Expert Names */}
+          <CardHeader className="p-0 mb-6">
+            <CardTitle className="text-[16px] font-bold text-[#1A1A1A]">
+              Experts Per Category
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ChartContainer
+              config={{
+                count: { label: "Count", color: "hsl(var(--primary))" },
+              }}
+              className="h-[280px] w-full"
+            >
+              <BarChart
+                data={barChartData}
+                margin={{ top: 20, right: 0, left: -20, bottom: -10 }}
+              >
+                <CartesianGrid
+                  vertical={false}
+                  strokeDasharray="3 3"
+                  stroke="#e0e0e0"
+                />
+                <XAxis
+                  dataKey="rank"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 12, fill: "#777" }}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 12, fill: "#777" }}
+                  domain={[0, 6]}
+                  ticks={[0, 1, 2, 3, 4, 5, 6]}
+                />
+                <Bar
+                  dataKey="count"
+                  fill="url(#colorGradient)"
+                  radius={[8, 8, 0, 0]}
+                  barSize={20}
+                />
+                {/* Define the vertical gradient */}{" "}
+                <defs>
+                  <linearGradient
+                    id="colorGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#00515C" />
+                    <stop offset="100%" stopColor="#00A7BA" />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ChartContainer>{" "}
+            {/* Custom Legend - Expert Names */}
             <div className="flex justify-between items-center text-xs text-[#777] font-medium pt-3 px-12">
-                {barChartData.map((expert, idx) => (
-                    <p key={idx} className="whitespace-nowrap">{expert.name}</p>
-                ))}
+              {barChartData.map((expert, idx) => (
+                <p key={idx} className="whitespace-nowrap">
+                  {expert.name}
+                </p>
+              ))}
             </div>
           </CardContent>
         </Card>

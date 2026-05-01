@@ -182,7 +182,7 @@ const ExpertFilter = () => (
 
 export default function VerifiedExpertsPage() {
   return (
-    <div className="min-h-screen bg-[#EAFCFF] px-0 font-sans">
+    <div className="min-h-screen  px-0 font-sans">
       {/* Background Gradient Effect */}
       {/* <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div

@@ -1,5 +1,6 @@
 "use client";
 
+import Pagination from "@/components/global/pagination";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,62 +14,72 @@ import { useState } from "react";
 
 export default function DataTable() {
   const [loading] = useState(false);
+  const [page, setPage] = useState<number>(1);
+  const totalPages = 5;
+
+  const handlePrev = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
   const usersData = [
     {
       name: "Ali Khan",
       email: "ali.khan@gmail.com",
-      joinDate: "2023-05-12",
+      joinDate: "12-05-2023",
       jobPost: 12,
-      revenueGenerated: 450.00,
+      revenueGenerated: 450.0,
     },
     {
       name: "Sara Ahmed",
       email: "sara.ahmed@yahoo.com",
-      joinDate: "2022-11-03",
+      joinDate: "11-03-2022",
       jobPost: 25,
       revenueGenerated: 980.25,
     },
     {
       name: "Usman Tariq",
       email: "usman.tariq@hotmail.com",
-      joinDate: "2024-01-20",
+      joinDate: "01-20-2024",
       jobPost: 8,
       revenueGenerated: 210.75,
     },
     {
       name: "Ayesha Malik",
       email: "ayesha.malik@gmail.com",
-      joinDate: "2023-07-15",
+      joinDate: "07-15-2023",
       jobPost: 18,
-      revenueGenerated: 6700.50,
+      revenueGenerated: 6700.5,
     },
     {
       name: "Bilal Hussain",
       email: "bilal.hussain@outlook.com",
-      joinDate: "2021-09-28",
+      joinDate: "09-28-2021",
       jobPost: 30,
-      revenueGenerated: 1200.00,
+      revenueGenerated: 1200.0,
     },
     {
       name: "Hina Sheikh",
       email: "hina.sheikh@gmail.com",
-      joinDate: "2022-03-10",
+      joinDate: "03-10-2022",
       jobPost: 15,
       revenueGenerated: 5400.25,
     },
     {
       name: "Farhan Ali",
       email: "farhan.ali@yahoo.com",
-      joinDate: "2024-02-05",
+      joinDate: "02-05-2024",
       jobPost: 5,
       revenueGenerated: 150.75,
     },
     {
       name: "Zainab Iqbal",
       email: "zainab.iqbal@gmail.com",
-      joinDate: "2023-10-22",
+      joinDate: "10-22-2023",
       jobPost: 20,
-      revenueGenerated: 720.50,
+      revenueGenerated: 720.5,
     },
   ];
   const getStatusColor = (status: string) => {
@@ -82,9 +93,9 @@ export default function DataTable() {
           <TableHeader className="  ">
             <TableRow className="">
               <TableHead className=" rounded-l-3xl   ">User Name</TableHead>
-              <TableHead >Email</TableHead>
-              <TableHead >Join Date</TableHead>
-              <TableHead >Job Post</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Join Date</TableHead>
+              <TableHead>Job Post</TableHead>
               <TableHead className=" rounded-r-3xl ">
                 Revenue Generated
               </TableHead>
@@ -103,8 +114,8 @@ export default function DataTable() {
                 </TableCell>
               </TableRow>
             ) : usersData.length ? (
-              usersData.map((user) => (
-                <TableRow key={user.id} className="">
+              usersData.map((user, index) => (
+                <TableRow key={index} className="">
                   <TableCell className="font-medium  ">{user.name}</TableCell>
 
                   <TableCell className="capitalize">{user.email}</TableCell>
@@ -126,31 +137,12 @@ export default function DataTable() {
           </TableBody>
         </Table>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between py-4 space-y-2 sm:space-y-0">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm">Items per page:</span>
-
-            <select value={10} className="border rounded px-2 py-1 text-sm">
-              {[5, 10, 20, 50].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-
-            <span className="text-sm font-medium">Page 1 of 1</span>
-
-            <Button variant="outline" size="sm" disabled>
-              Next
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
       </div>
     </div>
   );

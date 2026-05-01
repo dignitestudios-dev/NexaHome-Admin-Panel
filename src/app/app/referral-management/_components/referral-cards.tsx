@@ -24,7 +24,7 @@ export const ReferralCards = ({ cards }: ReferralCardsProps) => {
         return (
           <div
             key={card.id}
-            className="bg-white rounded-[24px] p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white rounded-[24px] p-6 transition-shadow"
           >
             <div className="flex items-center gap-4">
               {/* Icon Container */}

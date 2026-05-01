@@ -1,21 +1,16 @@
-import React from "react"
+import React from "react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { Progress } from "@/components/ui/progress"
+import { Progress } from "@/components/ui/progress";
 
 type Category = {
-  name: string
-  value: string
-  percentage: number
-  color?: string
-  gradient?: string
-}
+  name: string;
+  value: string;
+  percentage: number;
+  color?: string;
+  gradient?: string;
+};
 
 const categories: Category[] = [
   {
@@ -55,13 +50,13 @@ const categories: Category[] = [
     percentage: 100,
     color: "#004D4D",
   },
-]
+];
 
 const PopularCategories: React.FC = () => {
   return (
-    <Card className="rounded-[40px] border-none shadow-sm p-4">
+    <Card className="rounded-[40px] border-none shadow-sm pt-8 pb-4">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-[#1A1A1A]">
+        <CardTitle className="text-[16px] font-bold">
           Popular Categories
         </CardTitle>
       </CardHeader>
@@ -69,17 +64,16 @@ const PopularCategories: React.FC = () => {
       <CardContent className="space-y-6">
         {categories.map((cat, i) => (
           <div key={i} className="space-y-2">
-
             {/* Header */}
             <div className="flex justify-between items-center font-bold">
               <div className="flex items-center gap-3 text-[#1A1A1A]">
                 <span className="w-6 h-6 bg-[#004D4D] text-white text-[10px] flex items-center justify-center rounded-md font-black">
                   {i + 1}
                 </span>
-                <span className="text-sm">{cat.name}</span>
+                <span className="text-[12px] font-medium">{cat.name}</span>
               </div>
 
-              <span className="text-sm text-gray-500">
+              <span className="text-[12px] font-semibold text-gray-500">
                 {cat.value}
               </span>
             </div>
@@ -99,12 +93,11 @@ const PopularCategories: React.FC = () => {
                 }}
               />
             </div>
-
           </div>
         ))}
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default PopularCategories
+export default PopularCategories;

@@ -14,8 +14,6 @@ import ExpertDataTable from "./_components/expert-data-table";
 import { AreasFilters } from "./_components/areas-filters";
 import { JobsFilters } from "./_components/jobs-filters";
 
-
-
 export default function PerformanceIntelligence() {
   const tabs = ["Top Jobs", "Top Areas", "Top Homeowners", "Top Experts"];
   const searchParams = useSearchParams();
@@ -26,31 +24,42 @@ export default function PerformanceIntelligence() {
   const handleTabChange = (tab: string) => {
     router.push(`?tab=${tab}`);
   };
-    const renderTable = (tab: string) => {
+  const renderTable = (tab: string) => {
     switch (tab) {
       case "Top Jobs":
-        return <div><JobsDataTable /></div>;
+        return (
+          <div>
+            <JobsDataTable />
+          </div>
+        );
 
       case "Top Areas":
-        return <div><AreaDataTable /></div>;
+        return (
+          <div>
+            <AreaDataTable />
+          </div>
+        );
 
       case "Top Homeowners":
-        return <div><HomeOwnersDataTable /></div>;
+        return (
+          <div>
+            <HomeOwnersDataTable />
+          </div>
+        );
 
       case "Top Experts":
-        return <div><ExpertDataTable /></div>;
-
-     
+        return (
+          <div>
+            <ExpertDataTable />
+          </div>
+        );
     }
   };
   return (
     <div>
       <h1 className="heading">Performance Intelligence</h1>
       <div className="flex justify-between py-4">
-        <div
-          className="inline-flex items-center bg-white rounded-[10px] p-1 gap-1 shadow-sm"
-          
-        >
+        <div className="inline-flex items-center bg-white rounded-[10px] p-1 gap-1 ">
           {tabs.map((tab, i) => (
             <Button
               key={tab}
