@@ -14,6 +14,7 @@ export interface JobActivityProfilePicture {
 export interface JobActivityPerson {
   _id?: string;
   name?: string;
+  companyName?: string | null;
   userName?: string;
   email?: string;
   profilePicture?: JobActivityProfilePicture | string | null;

@@ -52,7 +52,7 @@ const menu = [
     link: "/app/category-package",
   },
   {
-    label: "Verified Experts",
+    label: "Trusted Expert Badges ",
     icon: BadgeCheck,
     link: "/app/verified-experts",
   },

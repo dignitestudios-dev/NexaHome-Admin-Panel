@@ -12,10 +12,17 @@ export const usersApi = {
     page = 1,
     limit = 10,
     search,
+    status = "all",
+    userType = "all",
   }: GetUsersParams = {}): Promise<UsersListResult> => {
     try {
       const params: Record<string, string | number> = { page, limit };
       if (search?.trim()) params.search = search.trim();
+      if (status && status !== "all") params.status = status;
+      if (userType && userType !== "all") {
+        // Backend filters by role (User / Service Provider / Partner)
+        params.role = userType;
+      }
 
       const { data } = await API.get<UsersListResponse>("/admin/users", {
         params,

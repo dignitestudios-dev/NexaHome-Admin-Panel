@@ -74,17 +74,12 @@ export function validateCategoryCredits(value: string): string | null {
   return null;
 }
 
-function sortCategoriesByNewest(categories: Category[]): Category[] {
-  return [...categories].sort((a, b) => {
-    const aTime = new Date(a.createdAt).getTime();
-    const bTime = new Date(b.createdAt).getTime();
-
-    if (!Number.isNaN(aTime) && !Number.isNaN(bTime) && aTime !== bTime) {
-      return bTime - aTime;
-    }
-
-    return b._id.localeCompare(a._id);
-  });
+function sortCategoriesAlphabetically(categories: Category[]): Category[] {
+  return [...categories].sort((a, b) =>
+    (a.name ?? "").localeCompare(b.name ?? "", undefined, {
+      sensitivity: "base",
+    })
+  );
 }
 
 export const categoriesApi = {
@@ -92,14 +87,19 @@ export const categoriesApi = {
     page = 1,
     limit = 10,
     search,
+    status = "all",
   }: GetCategoriesParams = {}): Promise<CategoriesListResult> => {
     try {
-      const params: Record<string, string | number> = { page, limit };
+      const params: Record<string, string | number> = {
+        page,
+        limit,
+        status: status || "all",
+      };
       if (search?.trim()) params.search = search.trim();
 
       const { data } = await API.get("/admin/categories", { params });
       const payload = (data?.data ?? data) as CategoriesListResponse;
-      const categories = sortCategoriesByNewest(payload?.categories ?? []);
+      const categories = sortCategoriesAlphabetically(payload?.categories ?? []);
       const pagination = payload?.pagination;
 
       const total =

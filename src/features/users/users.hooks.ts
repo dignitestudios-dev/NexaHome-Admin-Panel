@@ -4,24 +4,37 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { usersApi } from "./users.api";
-import type { User, UsersListResult } from "./users.types";
+import type { User, UsersListResult, UserStatusFilter, UserTypeFilter } from "./users.types";
 
 export const userKeys = {
   all: ["users"] as const,
-  list: (page: number, limit: number, search: string) =>
-    ["users", "list", page, limit, search] as const,
+  list: (
+    page: number,
+    limit: number,
+    search: string,
+    status: UserStatusFilter,
+    userType: UserTypeFilter
+  ) => ["users", "list", page, limit, search, status, userType] as const,
 };
 
-export function useUsers(page = 1, limit = 10, search?: string) {
+export function useUsers(
+  page = 1,
+  limit = 10,
+  search?: string,
+  status: UserStatusFilter = "all",
+  userType: UserTypeFilter = "all"
+) {
   const normalizedSearch = search?.trim() ?? "";
 
   return useQuery({
-    queryKey: userKeys.list(page, limit, normalizedSearch),
+    queryKey: userKeys.list(page, limit, normalizedSearch, status, userType),
     queryFn: () =>
       usersApi.getUsers({
         page,
         limit,
         search: normalizedSearch || undefined,
+        status,
+        userType,
       }),
   });
 }

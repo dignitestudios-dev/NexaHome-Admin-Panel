@@ -25,8 +25,9 @@ const MONTH_NAMES = [
   "Dec",
 ];
 
-// Monday → Sunday single-letter labels
+// Monday → Sunday labels (must be unique — duplicate "T" breaks Recharts)
 const DAY_LETTERS_MON_TO_SUN = ["M", "T", "W", "T", "F", "S", "S"];
+const DAY_NAMES_MON_TO_SUN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Monday = 0 … Sunday = 6
 function mondayFirstIndex(date: Date): number {
@@ -101,15 +102,20 @@ function normalizeGrowthWeekSeries(series: unknown[]): GrowthPoint[] {
   }));
 }
 
-// Current calendar week only: Monday → Sunday.
+// Full week Monday → Sunday; fill days that API returns, others stay 0.
 function normalizeRevenueWeekSeries(series: unknown[]): RevenuePoint[] {
-  const slots = buildCurrentWeekSlots(
-    series,
-    (item) => getRevenueValue(item),
-    0
-  );
+  const slots: number[] = Array(7).fill(0);
 
-  return DAY_LETTERS_MON_TO_SUN.map((name, i) => ({
+  for (const raw of series) {
+    const item = (raw ?? {}) as Record<string, unknown>;
+    const period = String(item.period ?? item.name ?? item.label ?? "");
+    const date = parsePeriodToDate(period);
+    if (!date) continue;
+
+    slots[mondayFirstIndex(date)] = getRevenueValue(item);
+  }
+
+  return DAY_NAMES_MON_TO_SUN.map((name, i) => ({
     name,
     revenue: slots[i] ?? 0,
   }));

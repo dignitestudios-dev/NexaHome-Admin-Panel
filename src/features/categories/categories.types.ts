@@ -46,10 +46,13 @@ export interface CategoriesListResponse {
   totalPages?: number;
 }
 
+export type CategoryStatusFilter = "all" | "active" | "inactive";
+
 export interface GetCategoriesParams {
   page?: number;
   limit?: number;
   search?: string;
+  status?: CategoryStatusFilter;
 }
 
 export interface CreateCategoryPayload {

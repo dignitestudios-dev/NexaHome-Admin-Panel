@@ -69,6 +69,16 @@ export function getPersonName(person: JobActivityPerson | null): string {
   return person?.name ?? person?.userName ?? "—";
 }
 
+export function getVendorDisplayName(person: JobActivityPerson | null): string {
+  if (!person) return "—";
+  return (
+    person.companyName?.trim() ||
+    person.name?.trim() ||
+    person.userName?.trim() ||
+    "—"
+  );
+}
+
 export function getPersonImageUrl(
   person: JobActivityPerson | null
 ): string | undefined {

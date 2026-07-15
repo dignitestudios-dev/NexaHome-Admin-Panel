@@ -1,3 +1,5 @@
+export type ReportTab = "users" | "partners" | "providers";
+
 export interface ReportProfilePicture {
   _id?: string;
   fileName?: string;
@@ -20,6 +22,18 @@ export interface ReportUser {
   status: string;
 }
 
+/** Normalized row used by all report tabs */
+export interface ReportRow {
+  id: string;
+  name: string;
+  email: string;
+  profilePicture: ReportProfilePicture | string | null;
+  joinDate: string;
+  metricCount: number;
+  revenueGenerated: number;
+  status?: string;
+}
+
 export interface ReportsPagination {
   itemsPerPage: number;
   currentPage: number;
@@ -29,7 +43,9 @@ export interface ReportsPagination {
 
 export interface ReportsUsersListResponse {
   users?: ReportUser[];
-  reports?: ReportUser[];
+  partners?: Record<string, unknown>[];
+  providers?: Record<string, unknown>[];
+  reports?: ReportUser[] | Record<string, unknown>[];
   pagination?: ReportsPagination;
   page?: number;
   limit?: number;
@@ -43,11 +59,25 @@ export interface ReportDateFilters {
   endDate?: string;
 }
 
-export interface GetReportsUsersParams extends ReportDateFilters {
+export interface GetReportsParams extends ReportDateFilters {
   page?: number;
   limit?: number;
+  search?: string;
+  tab?: ReportTab;
 }
 
+/** @deprecated Prefer GetReportsParams */
+export type GetReportsUsersParams = GetReportsParams;
+
+export interface ReportsListResult {
+  rows: ReportRow[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/** @deprecated Prefer ReportsListResult */
 export interface ReportsUsersListResult {
   users: ReportUser[];
   page: number;
@@ -55,3 +85,9 @@ export interface ReportsUsersListResult {
   total: number;
   totalPages: number;
 }
+
+export const REPORT_TABS: { label: string; value: ReportTab }[] = [
+  { label: "Users", value: "users" },
+  { label: "Partners", value: "partners" },
+  { label: "Providers", value: "providers" },
+];

@@ -17,6 +17,7 @@ export interface Expert {
   _id: string;
   email: string;
   name: string;
+  companyName?: string | null;
   profilePicture: ExpertProfilePicture | string | null;
   joinDate: string;
   isEligibleForBadge: boolean;

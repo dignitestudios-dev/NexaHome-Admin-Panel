@@ -31,7 +31,13 @@ export interface GetUsersParams {
   page?: number;
   limit?: number;
   search?: string;
+  status?: UserStatusFilter;
+  userType?: UserTypeFilter;
 }
+
+export type UserStatusFilter = "all" | "active" | "inactive";
+
+export type UserTypeFilter = "all" | "user" | "service-provider" | "partner";
 
 export interface UsersPagination {
   itemsPerPage?: number;

@@ -67,14 +67,14 @@ function CategoryStatusToggle({
           disabled={disabled}
           onClick={() => onChange(!isActive)}
           className={cn(
-            "relative h-8 w-14 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+            "relative h-8 w-14 shrink-0 rounded-full transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60",
             isActive ? "bg-[#16BC4E]" : "bg-slate-300"
           )}
         >
           <span
             className={cn(
-              "absolute top-1 h-6 w-6 rounded-full bg-white shadow-md transition-transform",
-              isActive ? "left-7" : "left-1"
+              "absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-150 will-change-transform",
+              isActive ? "translate-x-6" : "translate-x-0"
             )}
           />
         </button>
@@ -105,6 +105,7 @@ export function EditCategoryModal({
   );
 
   const categoryData = fetchedCategory ?? category;
+  const categoryId = category?._id ?? "";
 
   const [name, setName] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -114,15 +115,18 @@ export function EditCategoryModal({
   const [submitError, setSubmitError] = useState("");
   const [showNameError, setShowNameError] = useState(false);
 
+  // Init once when modal opens for a category — don't overwrite local toggle
+  // when the detail query finishes loading.
   useEffect(() => {
-    if (!open || !categoryData) return;
-    setName(categoryData.name ?? "");
+    if (!open || !category) return;
+
+    setName(category.name ?? "");
     setIsActive(
-      categoryData.isActive === false || categoryData.isActive === "inactive"
+      category.isActive === false || category.isActive === "inactive"
         ? false
         : true
     );
-    setIconPreview(categoryData.icon?.location ?? "");
+    setIconPreview(category.icon?.location ?? "");
     setIconFile(null);
     setIconError("");
     setSubmitError("");
@@ -130,7 +134,8 @@ export function EditCategoryModal({
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  }, [open, categoryData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-init when opening a category
+  }, [open, categoryId]);
 
   useEffect(() => {
     return () => {
@@ -266,7 +271,7 @@ export function EditCategoryModal({
               <>
                 <CategoryStatusToggle
                   isActive={isActive}
-                  disabled={updateCategory.isPending}
+                  disabled={isLoadingCategory && !categoryData}
                   onChange={(next) => {
                     setSubmitError("");
                     setIsActive(next);

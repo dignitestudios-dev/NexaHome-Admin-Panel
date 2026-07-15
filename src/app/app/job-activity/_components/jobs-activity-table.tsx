@@ -21,6 +21,7 @@ import {
   getPersonName,
   getPostedBy,
   getVendorAssigned,
+  getVendorDisplayName,
 } from "@/features/jobs-activity/jobs-activity.api";
 import { useJobsActivity } from "@/features/jobs-activity/jobs-activity.hooks";
 import type { JobActivityStatus } from "@/features/jobs-activity/jobs-activity.types";
@@ -37,15 +38,19 @@ const ITEMS_PER_PAGE = 10;
 function PersonCell({
   person,
   emptyLabel = "Not assigned",
+  preferCompanyName = false,
 }: {
   person: ReturnType<typeof getPostedBy>;
   emptyLabel?: string;
+  preferCompanyName?: boolean;
 }) {
   if (!person) {
     return <span className="text-slate-400">{emptyLabel}</span>;
   }
 
-  const name = getPersonName(person);
+  const name = preferCompanyName
+    ? getVendorDisplayName(person)
+    : getPersonName(person);
 
   return (
     <div className="flex items-center gap-3">
@@ -150,7 +155,7 @@ export default function JobsActivityTable({
                       <PersonCell person={postedBy} />
                     </TableCell>
                     <TableCell className="py-6">
-                      <PersonCell person={vendor} />
+                      <PersonCell person={vendor} preferCompanyName />
                     </TableCell>
                     <TableCell className="py-6 font-bold">
                       <span className={getJobActivityStatusColor(jobStatus)}>

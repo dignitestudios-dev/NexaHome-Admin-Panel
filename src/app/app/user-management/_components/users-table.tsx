@@ -26,7 +26,7 @@ import { Eye } from "lucide-react";
 
 import { useUsers } from "@/features/users/users.hooks";
 
-import type { User } from "@/features/users/users.types";
+import type { User, UserStatusFilter, UserTypeFilter } from "@/features/users/users.types";
 
 import { formatDate } from "@/lib/date";
 
@@ -68,20 +68,28 @@ function formatRole(role: string) {
 
 
 
-export const UsersTable = ({ search = "" }: { search?: string }) => {
-
+export const UsersTable = ({
+  search = "",
+  status = "all",
+  userType = "all",
+}: {
+  search?: string;
+  status?: UserStatusFilter;
+  userType?: UserTypeFilter;
+}) => {
   const [page, setPage] = useState(1);
-
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [search, status, userType]);
 
   const { data, isLoading, isError, error } = useUsers(
     page,
     USERS_PER_PAGE,
-    search
+    search,
+    status,
+    userType
   );
 
   const users = data?.users ?? [];

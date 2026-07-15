@@ -3,10 +3,15 @@
 import { useEffect, useState } from "react";
 import SearchInput from "@/components/global/search-input";
 import { UsersTable } from "./_components/users-table";
+import { UserStatusFilter } from "./_components/user-status-filter";
+import type { UserStatusFilter as StatusFilter } from "@/features/users/users.types";
+import type { UserTypeFilter as TypeFilter } from "@/features/users/users.types";
 
 export default function UserManagementPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [userType, setUserType] = useState<TypeFilter>("all");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -22,15 +27,25 @@ export default function UserManagementPage() {
         <h1 className="heading text-[#1C1C1C] tracking-tight">
           User Management
         </h1>
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder="Search by name and email"
-        />
+        <div className="flex items-center gap-2">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by name and email"
+          />
+          <UserStatusFilter
+            status={status}
+            userType={userType}
+            onApply={({ status: nextStatus, userType: nextType }) => {
+              setStatus(nextStatus);
+              setUserType(nextType);
+            }}
+          />
+        </div>
       </div>
 
       <div className="relative z-10">
-        <UsersTable search={debouncedSearch} />
+        <UsersTable search={debouncedSearch} status={status} userType={userType} />
       </div>
     </div>
   );

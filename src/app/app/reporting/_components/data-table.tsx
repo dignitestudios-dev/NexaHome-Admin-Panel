@@ -12,14 +12,19 @@ import {
 } from "@/components/ui/table";
 import {
   formatReportRevenue,
+  getReportMetricColumnLabel,
+  getReportNameColumnLabel,
   getReportProfileImageUrl,
   getReportUserInitials,
 } from "@/features/reports/reports.api";
-import { useReportsUsers } from "@/features/reports/reports.hooks";
+import { useReports } from "@/features/reports/reports.hooks";
+import type { ReportTab } from "@/features/reports/reports.types";
 import { formatDate } from "@/lib/date";
 
 type DataTableProps = {
+  tab: ReportTab;
   page: number;
+  search?: string;
   startDate?: string;
   endDate?: string;
   onPageChange: (page: number) => void;
@@ -28,20 +33,26 @@ type DataTableProps = {
 const ITEMS_PER_PAGE = 10;
 
 export default function DataTable({
+  tab,
   page,
+  search,
   startDate,
   endDate,
   onPageChange,
 }: DataTableProps) {
-  const { data, isLoading, isError, error } = useReportsUsers({
+  const { data, isLoading, isError, error } = useReports({
+    tab,
     page,
     limit: ITEMS_PER_PAGE,
     startDate,
     endDate,
+    search,
   });
 
-  const users = data?.users ?? [];
+  const rows = data?.rows ?? [];
   const totalPages = data?.totalPages ?? 1;
+  const nameColumn = getReportNameColumnLabel(tab);
+  const metricColumn = getReportMetricColumnLabel(tab);
 
   const handlePrev = () => {
     if (page > 1) onPageChange(page - 1);
@@ -57,10 +68,10 @@ export default function DataTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="rounded-l-3xl">User Name</TableHead>
+              <TableHead className="rounded-l-3xl">{nameColumn}</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Join Date</TableHead>
-              <TableHead>Job Post</TableHead>
+              <TableHead>{metricColumn}</TableHead>
               <TableHead className="rounded-r-3xl">Revenue Generated</TableHead>
             </TableRow>
           </TableHeader>
@@ -81,29 +92,29 @@ export default function DataTable({
                   </div>
                 </TableCell>
               </TableRow>
-            ) : users.length ? (
-              users.map((user) => (
-                <TableRow key={user.userId}>
+            ) : rows.length ? (
+              rows.map((row) => (
+                <TableRow key={row.id || `${row.email}-${row.name}`}>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-10 w-10 rounded-full">
                         <AvatarImage
-                          src={getReportProfileImageUrl(user)}
-                          alt={user.userName}
+                          src={getReportProfileImageUrl(row)}
+                          alt={row.name}
                           className="object-cover"
                         />
                         <AvatarFallback className="rounded-full bg-[#005864] text-white text-[11px] font-medium">
-                          {getReportUserInitials(user.userName)}
+                          {getReportUserInitials(row.name)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{user.userName}</span>
+                      <span className="font-medium">{row.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{formatDate(user.joinDate)}</TableCell>
-                  <TableCell>{user.jobsPosted}</TableCell>
+                  <TableCell>{row.email}</TableCell>
+                  <TableCell>{formatDate(row.joinDate)}</TableCell>
+                  <TableCell>{row.metricCount}</TableCell>
                   <TableCell>
-                    {formatReportRevenue(user.revenueGenerated)}
+                    {formatReportRevenue(row.revenueGenerated)}
                   </TableCell>
                 </TableRow>
               ))
@@ -117,7 +128,7 @@ export default function DataTable({
           </TableBody>
         </Table>
 
-        {!isLoading && !isError && users.length > 0 && (
+        {!isLoading && !isError && rows.length > 0 && (
           <Pagination
             currentPage={page}
             totalPages={totalPages}

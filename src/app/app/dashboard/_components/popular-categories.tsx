@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { usePopularCategories } from "@/features/dashboard/dashboard.hooks";
 import { cn } from "@/lib/utils";
 
-const barColors = ["#004D4D", "#005864", "#0A6270", "#0FA3A3", "#40B480"];
+const BAR_COLOR = "#005864";
 
 const PopularCategories: React.FC = () => {
   const { data, isLoading, isError, error } = usePopularCategories();
@@ -61,7 +61,6 @@ const PopularCategories: React.FC = () => {
         {!isLoading &&
           categories.map((cat, i) => {
             const percentage = maxJobs > 0 ? (cat.jobsCount / maxJobs) * 100 : 0;
-            const color = barColors[i % barColors.length];
 
             return (
               <div key={cat._id} className="space-y-2">
@@ -85,7 +84,7 @@ const PopularCategories: React.FC = () => {
                     className="absolute top-0 left-0 h-2 rounded-full transition-all duration-500"
                     style={{
                       width: `${percentage}%`,
-                      backgroundColor: color,
+                      backgroundColor: BAR_COLOR,
                     }}
                   />
                 </div>

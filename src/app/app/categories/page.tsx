@@ -66,6 +66,7 @@ const CategoriesPage = () => {
         <CategoriesTable
           page={page}
           search={debouncedSearch}
+          status="all"
           onPageChange={setPage}
         />
       </div>

@@ -14,7 +14,10 @@ import { Eye, Pencil } from "lucide-react";
 import Pagination from "@/components/global/pagination";
 import { formatCategoryPricing } from "@/features/categories/categories.api";
 import { useCategories } from "@/features/categories/categories.hooks";
-import type { Category } from "@/features/categories/categories.types";
+import type {
+  Category,
+  CategoryStatusFilter,
+} from "@/features/categories/categories.types";
 import { formatDate } from "@/lib/date";
 import { CategoryDetailsModal } from "./category-details-modal";
 import { EditCategoryModal } from "./edit-category-modal";
@@ -22,6 +25,7 @@ import { EditCategoryModal } from "./edit-category-modal";
 type CategoriesTableProps = {
   page: number;
   search: string;
+  status?: CategoryStatusFilter;
   onPageChange: (page: number) => void;
 };
 
@@ -43,6 +47,7 @@ function getInitials(name?: string) {
 export const CategoriesTable = ({
   page,
   search,
+  status = "all",
   onPageChange,
 }: CategoriesTableProps) => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
@@ -54,6 +59,7 @@ export const CategoriesTable = ({
     page,
     limit: ITEMS_PER_PAGE,
     search: search || undefined,
+    status,
   });
 
   const categories = data?.categories ?? [];

@@ -37,6 +37,10 @@ function hasVerifiedBadge(expert: Expert) {
   return Boolean(expert.isBadgeActive);
 }
 
+function getCompanyName(expert: Expert) {
+  return expert.companyName?.trim() || expert.name?.trim() || "—";
+}
+
 export const ExpertTable = () => {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, error } = useExperts(page, EXPERTS_PER_PAGE);
@@ -57,7 +61,7 @@ export const ExpertTable = () => {
         <Table>
           <TableHeader>
             <TableRow className="font-light">
-              <TableHead className="rounded-l-3xl">Expert Name</TableHead>
+              <TableHead className="rounded-l-3xl">Company Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Join Date</TableHead>
               <TableHead>Badge Purchased Date</TableHead>
@@ -84,6 +88,7 @@ export const ExpertTable = () => {
             ) : experts.length ? (
               experts.map((expert) => {
                 const status = expert.isBadgeActive ? "Active" : "Inactive";
+                const companyName = getCompanyName(expert);
 
                 return (
                   <TableRow key={expert._id} className="font-normal">
@@ -92,14 +97,14 @@ export const ExpertTable = () => {
                         <Avatar className="h-10 w-10">
                           <AvatarImage
                             src={getProfileImageUrl(expert)}
-                            alt={expert.name}
+                            alt={companyName}
                           />
                           <AvatarFallback className="bg-[#212121] text-white font-medium text-[12px]">
-                            {getInitials(expert.name)}
+                            {getInitials(companyName)}
                           </AvatarFallback>
                         </Avatar>
                         <span className="flex items-center gap-1.5">
-                          {expert.name}
+                          {companyName}
                           {hasVerifiedBadge(expert) ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img

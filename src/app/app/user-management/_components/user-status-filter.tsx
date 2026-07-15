@@ -13,35 +13,48 @@ import {
 } from "@/components/ui/drawer";
 import { CgClose } from "react-icons/cg";
 import { FaFilter } from "react-icons/fa";
-import type { CategoryStatusFilter } from "@/features/categories/categories.types";
+import type { UserStatusFilter, UserTypeFilter } from "@/features/users/users.types";
 
-const STATUS_OPTIONS: { label: string; value: CategoryStatusFilter }[] = [
+const STATUS_OPTIONS: { label: string; value: UserStatusFilter }[] = [
   { label: "All", value: "all" },
   { label: "Active", value: "active" },
   { label: "Inactive", value: "inactive" },
 ];
 
-type CategoriesFiltersProps = {
-  value?: CategoryStatusFilter;
-  onApply: (status: CategoryStatusFilter) => void;
+const USER_TYPE_OPTIONS: { label: string; value: UserTypeFilter }[] = [
+  { label: "All", value: "all" },
+  { label: "User", value: "user" },
+  { label: "Service Provider", value: "service-provider" },
+  { label: "Partner", value: "partner" },
+];
+
+type UserStatusFilterProps = {
+  status?: UserStatusFilter;
+  userType?: UserTypeFilter;
+  onApply: (filters: { status: UserStatusFilter; userType: UserTypeFilter }) => void;
 };
 
-export function CategoriesFilters({
-  value = "all",
+export function UserStatusFilter({
+  status = "all",
+  userType = "all",
   onApply,
-}: CategoriesFiltersProps) {
-  const [selected, setSelected] = useState<CategoryStatusFilter>(value);
+}: UserStatusFilterProps) {
+  const [selectedStatus, setSelectedStatus] = useState<UserStatusFilter>(status);
+  const [selectedUserType, setSelectedUserType] =
+    useState<UserTypeFilter>(userType);
 
   useEffect(() => {
-    setSelected(value);
-  }, [value]);
+    setSelectedStatus(status);
+    setSelectedUserType(userType);
+  }, [status, userType]);
 
   const handleClearAll = () => {
-    setSelected("all");
+    setSelectedStatus("all");
+    setSelectedUserType("all");
   };
 
   const handleApply = () => {
-    onApply(selected);
+    onApply({ status: selectedStatus, userType: selectedUserType });
   };
 
   return (
@@ -81,9 +94,31 @@ export function CategoriesFilters({
               >
                 <input
                   type="radio"
-                  name="category-status"
-                  checked={selected === option.value}
-                  onChange={() => setSelected(option.value)}
+                  name="user-status"
+                  checked={selectedStatus === option.value}
+                  onChange={() => setSelectedStatus(option.value)}
+                  className="h-4 w-4 accent-[#005864]"
+                />
+                <span className="text-[16px]">{option.label}</span>
+              </label>
+            ))}
+          </div>
+
+          <div className="mt-6 mb-4 flex justify-between">
+            <span className="text-[20px] font-semibold">User Type</span>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {USER_TYPE_OPTIONS.map((option) => (
+              <label
+                key={option.value}
+                className="flex cursor-pointer items-center gap-3"
+              >
+                <input
+                  type="radio"
+                  name="user-type"
+                  checked={selectedUserType === option.value}
+                  onChange={() => setSelectedUserType(option.value)}
                   className="h-4 w-4 accent-[#005864]"
                 />
                 <span className="text-[16px]">{option.label}</span>

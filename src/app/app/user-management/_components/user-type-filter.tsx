@@ -13,36 +13,32 @@ import {
 } from "@/components/ui/drawer";
 import { CgClose } from "react-icons/cg";
 import { FaFilter } from "react-icons/fa";
-import type { CategoryStatusFilter } from "@/features/categories/categories.types";
+import type { UserTypeFilter } from "@/features/users/users.types";
 
-const STATUS_OPTIONS: { label: string; value: CategoryStatusFilter }[] = [
+const TYPE_OPTIONS: { label: string; value: UserTypeFilter }[] = [
   { label: "All", value: "all" },
-  { label: "Active", value: "active" },
-  { label: "Inactive", value: "inactive" },
+  { label: "User", value: "user" },
+  { label: "Service Provider", value: "service-provider" },
+  { label: "Partner", value: "partner" },
 ];
 
-type CategoriesFiltersProps = {
-  value?: CategoryStatusFilter;
-  onApply: (status: CategoryStatusFilter) => void;
+type UserTypeFilterProps = {
+  value?: UserTypeFilter;
+  onApply: (status: UserTypeFilter) => void;
 };
 
-export function CategoriesFilters({
+export function UserTypeFilter({
   value = "all",
   onApply,
-}: CategoriesFiltersProps) {
-  const [selected, setSelected] = useState<CategoryStatusFilter>(value);
+}: UserTypeFilterProps) {
+  const [selected, setSelected] = useState<UserTypeFilter>(value);
 
   useEffect(() => {
     setSelected(value);
   }, [value]);
 
-  const handleClearAll = () => {
-    setSelected("all");
-  };
-
-  const handleApply = () => {
-    onApply(selected);
-  };
+  const handleClearAll = () => setSelected("all");
+  const handleApply = () => onApply(selected);
 
   return (
     <Drawer direction="right">
@@ -63,7 +59,7 @@ export function CategoriesFilters({
 
         <div className="p-4">
           <div className="mb-4 flex justify-between">
-            <span className="text-[20px] font-semibold">Status</span>
+            <span className="text-[20px] font-semibold">User Type</span>
             <button
               type="button"
               onClick={handleClearAll}
@@ -74,14 +70,14 @@ export function CategoriesFilters({
           </div>
 
           <div className="flex flex-col gap-3">
-            {STATUS_OPTIONS.map((option) => (
+            {TYPE_OPTIONS.map((option) => (
               <label
                 key={option.value}
                 className="flex cursor-pointer items-center gap-3"
               >
                 <input
                   type="radio"
-                  name="category-status"
+                  name="user-type"
                   checked={selected === option.value}
                   onChange={() => setSelected(option.value)}
                   className="h-4 w-4 accent-[#005864]"
@@ -108,3 +104,4 @@ export function CategoriesFilters({
     </Drawer>
   );
 }
+

@@ -261,7 +261,7 @@ export const AddCategoryModal = ({
                   htmlFor="one-time-credits"
                   className="text-sm font-medium text-slate-700"
                 >
-                  One Time Credits <span className="text-red-500">*</span>
+                  One-Time Credits <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="one-time-credits"
@@ -271,7 +271,7 @@ export const AddCategoryModal = ({
                   maxLength={MAX_CATEGORY_CREDITS_DIGITS}
                   value={formData.oneTimeCredits}
                   onChange={handleInputChange}
-                  placeholder="e.g. 100"
+                  placeholder="e.g. 50"
                   disabled={createCategory.isPending}
                   className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
                 />
@@ -295,7 +295,7 @@ export const AddCategoryModal = ({
                   maxLength={MAX_CATEGORY_CREDITS_DIGITS}
                   value={formData.recurringCredits}
                   onChange={handleInputChange}
-                  placeholder="e.g. 50"
+                  placeholder="e.g. 100"
                   disabled={createCategory.isPending}
                   className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
                 />

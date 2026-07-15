@@ -83,7 +83,11 @@ const RevenueAnalysis = () => {
               />
 
               <Tooltip
-                cursor={{ fill: "rgba(15,163,163,0.1)" }}
+                cursor={{
+                  fill: "rgba(15,163,163,0.1)",
+                  stroke: "transparent",
+                  strokeWidth: 0,
+                }}
                 contentStyle={{
                   borderRadius: "12px",
                   border: "none",
@@ -96,6 +100,8 @@ const RevenueAnalysis = () => {
                 radius={[4, 4, 0, 0]}
                 fill="#0FA3A3"
                 maxBarSize={36}
+                activeBar={false}
+                isAnimationActive={false}
               />
             </BarChart>
           </ResponsiveContainer>
