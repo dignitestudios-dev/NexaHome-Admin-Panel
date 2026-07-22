@@ -30,6 +30,7 @@ export interface Partner {
   usersReferredCount: number;
   jobsPosted: number;
   revenueGenerated: number;
+  linkReferralsCount?: number;
   status: string;
 }
 

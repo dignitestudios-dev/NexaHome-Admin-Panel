@@ -259,7 +259,44 @@ export const dashboardApi = {
       const { data } = await API.get("/admin/dashboard/insights", {
         params: buildFilterParams(filters),
       });
-      return (data?.data ?? data) as DashboardInsights;
+      const root = ((data?.data ?? data) ?? {}) as Record<string, unknown>;
+
+      const activeUsersPercent = Number(root.activeUsersPercent ?? root.activeUsers) || 0;
+      const activeUsersCount = root.activeUsersCount != null
+        ? Number(root.activeUsersCount)
+        : (root.activeUsersValue != null ? Number(root.activeUsersValue) : undefined);
+      const activeUsersTotal = root.activeUsersTotal != null
+        ? Number(root.activeUsersTotal)
+        : (root.totalUsers != null ? Number(root.totalUsers) : undefined);
+
+      const repeatHomeownersPercent = Number(root.repeatHomeownersPercent ?? root.repeatHomeowners) || 0;
+      const repeatHomeownersCount = root.repeatHomeownersCount != null
+        ? Number(root.repeatHomeownersCount)
+        : (root.repeatHomeownersValue != null ? Number(root.repeatHomeownersValue) : undefined);
+      const repeatHomeownersTotal = root.repeatHomeownersTotal != null
+        ? Number(root.repeatHomeownersTotal)
+        : (root.totalHomeowners != null ? Number(root.totalHomeowners) : undefined);
+
+      const completedJobsPercent = Number(root.completedJobsPercent ?? root.completedJobs) || 0;
+      const completedJobsCount = root.completedJobsCount != null
+        ? Number(root.completedJobsCount)
+        : (root.completedJobsValue != null ? Number(root.completedJobsValue) : undefined);
+      const completedJobsTotal = root.completedJobsTotal != null
+        ? Number(root.completedJobsTotal)
+        : (root.totalJobs != null ? Number(root.totalJobs) : undefined);
+
+      return {
+        activeUsersPercent,
+        activeUsersCount,
+        activeUsersTotal,
+        repeatHomeownersPercent,
+        repeatHomeownersCount,
+        repeatHomeownersTotal,
+        completedJobsPercent,
+        completedJobsCount,
+        completedJobsTotal,
+        averageRating: Number(root.averageRating) || 0,
+      };
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
     }

@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { MapPin, X, Loader2 } from "lucide-react";
 import { useMe, useLogout } from "@/features/auth/auth.hooks";
 import { useDashboardFilters } from "@/components/global/filter-context";
@@ -34,11 +34,16 @@ function getInitials(name?: string) {
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
   const { data: admin, isLoading } = useMe();
   const logout = useLogout();
   const { city, zipCode, setCity, setZipCode, resetFilters } =
     useDashboardFilters();
+
+  const showLocationFilters = pathname.startsWith(
+    "/app/performance-intelligence"
+  );
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -54,40 +59,46 @@ export default function Navbar() {
   return (
     <>
       {/* Navbar */}
-      <div className="w-full bg-white rounded-2xl px-6 py-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
-        {/* City and ZIP Code Global Filters */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 bg-[#F4F9F9] border border-[#005864]/10 rounded-xl px-3 py-1.5 text-xs text-gray-600">
-            <MapPin className="w-4 h-4 text-[#005864]" />
-            <input
-              type="text"
-              placeholder="Filter by City..."
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="bg-transparent border-none outline-none text-xs font-medium text-[#181818] placeholder-gray-400 w-32 focus:w-40 transition-all"
-            />
-          </div>
+      <div
+        className={`w-full bg-white rounded-2xl px-6 py-4 flex flex-wrap items-center gap-4 shadow-sm ${
+          showLocationFilters ? "justify-between" : "justify-end"
+        }`}
+      >
+        {/* City and ZIP Code filters — performance-intelligence only */}
+        {showLocationFilters ? (
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 bg-[#F4F9F9] border border-[#005864]/10 rounded-xl px-3 py-1.5 text-xs text-gray-600">
+              <MapPin className="w-4 h-4 text-[#005864]" />
+              <input
+                type="text"
+                placeholder="Filter by City..."
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="bg-transparent border-none outline-none text-xs font-medium text-[#181818] placeholder-gray-400 w-32 focus:w-40 transition-all"
+              />
+            </div>
 
-          <div className="flex items-center gap-2 bg-[#F4F9F9] border border-[#005864]/10 rounded-xl px-3 py-1.5 text-xs text-gray-600">
-            <span className="font-bold text-[#005864] text-[11px]">ZIP</span>
-            <input
-              type="text"
-              placeholder="Filter by ZIP Code..."
-              value={zipCode}
-              onChange={(e) => setZipCode(e.target.value)}
-              className="bg-transparent border-none outline-none text-xs font-medium text-[#181818] placeholder-gray-400 w-32 focus:w-40 transition-all"
-            />
-          </div>
+            <div className="flex items-center gap-2 bg-[#F4F9F9] border border-[#005864]/10 rounded-xl px-3 py-1.5 text-xs text-gray-600">
+              <span className="font-bold text-[#005864] text-[11px]">ZIP</span>
+              <input
+                type="text"
+                placeholder="Filter by ZIP Code..."
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value)}
+                className="bg-transparent border-none outline-none text-xs font-medium text-[#181818] placeholder-gray-400 w-32 focus:w-40 transition-all"
+              />
+            </div>
 
-          {hasFilters && (
-            <button
-              onClick={resetFilters}
-              className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 transition-colors"
-            >
-              <X className="w-3.5 h-3.5" /> Clear Filters
-            </button>
-          )}
-        </div>
+            {hasFilters && (
+              <button
+                onClick={resetFilters}
+                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1 transition-colors"
+              >
+                <X className="w-3.5 h-3.5" /> Clear Filters
+              </button>
+            )}
+          </div>
+        ) : null}
 
         {/* User Dropdown */}
         <DropdownMenu>
