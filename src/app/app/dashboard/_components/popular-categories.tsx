@@ -5,12 +5,17 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { usePopularCategories } from "@/features/dashboard/dashboard.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 import { cn } from "@/lib/utils";
 
 const BAR_COLOR = "#005864";
 
 const PopularCategories: React.FC = () => {
-  const { data, isLoading, isError, error } = usePopularCategories();
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+  const { data, isLoading, isError, error } = usePopularCategories({
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
+  });
   const [isHovering, setIsHovering] = useState(false);
   const categories = data?.categories ?? [];
 

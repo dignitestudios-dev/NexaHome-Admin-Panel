@@ -20,7 +20,9 @@ import type { Category } from "@/features/categories/categories.types";
 import {
   validateCategoryIcon,
   validateCategoryName,
+  validateCategoryCredits,
   MAX_CATEGORY_NAME_LENGTH,
+  MAX_CATEGORY_CREDITS_DIGITS,
 } from "@/features/categories/categories.api";
 import { cn } from "@/lib/utils";
 
@@ -108,33 +110,55 @@ export function EditCategoryModal({
   const categoryId = category?._id ?? "";
 
   const [name, setName] = useState("");
+  const [oneTimeCredits, setOneTimeCredits] = useState("");
+  const [recurringCredits, setRecurringCredits] = useState("");
+  const [dollarPrice, setDollarPrice] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [iconPreview, setIconPreview] = useState("");
   const [iconError, setIconError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [showNameError, setShowNameError] = useState(false);
+  const [showCreditsError, setShowCreditsError] = useState(false);
 
-  // Init once when modal opens for a category — don't overwrite local toggle
-  // when the detail query finishes loading.
+  // Init once when modal opens for a category
   useEffect(() => {
     if (!open || !category) return;
 
-    setName(category.name ?? "");
+    const currentData = categoryData ?? category;
+    setName(currentData.name ?? "");
+    setOneTimeCredits(
+      currentData.pricing?.oneTimeCredits != null
+        ? String(currentData.pricing.oneTimeCredits)
+        : currentData.credits != null
+        ? String(currentData.credits)
+        : ""
+    );
+    setRecurringCredits(
+      currentData.pricing?.recurringCredits != null
+        ? String(currentData.pricing.recurringCredits)
+        : ""
+    );
+    setDollarPrice(
+      currentData.pricing?.dollarPrice != null
+        ? String(currentData.pricing.dollarPrice)
+        : ""
+    );
     setIsActive(
-      category.isActive === false || category.isActive === "inactive"
+      currentData.isActive === false || currentData.isActive === "inactive"
         ? false
         : true
     );
-    setIconPreview(category.icon?.location ?? "");
+    setIconPreview(currentData.icon?.location ?? "");
     setIconFile(null);
     setIconError("");
     setSubmitError("");
     setShowNameError(false);
+    setShowCreditsError(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-init when opening a category
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, categoryId]);
 
   useEffect(() => {
@@ -153,6 +177,7 @@ export function EditCategoryModal({
     setIconError("");
     setSubmitError("");
     setShowNameError(false);
+    setShowCreditsError(false);
     onOpenChange(false);
   };
 
@@ -195,12 +220,20 @@ export function EditCategoryModal({
       ? validateCategoryName(name)
       : "";
 
+  const oneTimeCreditsError = showCreditsError && oneTimeCredits.trim()
+    ? validateCategoryCredits(oneTimeCredits)
+    : "";
+  const recurringCreditsError = showCreditsError && recurringCredits.trim()
+    ? validateCategoryCredits(recurringCredits)
+    : "";
+
   const handleSave = () => {
     const categoryNameError = validateCategoryName(name);
     if (categoryNameError) {
       setShowNameError(true);
       return;
     }
+
     if (!categoryData?._id || iconError) return;
 
     if (iconFile) {
@@ -217,6 +250,9 @@ export function EditCategoryModal({
       {
         id: categoryData._id,
         name: name.trim(),
+        oneTimeCredits: oneTimeCredits.trim() ? Number(oneTimeCredits.trim()) : undefined,
+        recurringCredits: recurringCredits.trim() ? Number(recurringCredits.trim()) : undefined,
+        dollarPrice: dollarPrice.trim() ? Number(dollarPrice.trim()) : undefined,
         icon: iconFile ?? undefined,
         isActive,
       },
@@ -307,6 +343,85 @@ export function EditCategoryModal({
                   {nameError ? (
                     <p className="text-sm text-red-600">{nameError}</p>
                   ) : null}
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="edit-one-time-credits"
+                      className="text-sm font-medium text-slate-700"
+                    >
+                      One-Time Credits
+                    </Label>
+                    <Input
+                      id="edit-one-time-credits"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={MAX_CATEGORY_CREDITS_DIGITS}
+                      value={oneTimeCredits}
+                      onChange={(e) => {
+                        setSubmitError("");
+                        setShowCreditsError(false);
+                        setOneTimeCredits(e.target.value.replace(/\D/g, "").slice(0, MAX_CATEGORY_CREDITS_DIGITS));
+                      }}
+                      placeholder="e.g. 50"
+                      disabled={updateCategory.isPending}
+                      className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
+                    />
+                    {oneTimeCreditsError ? (
+                      <p className="text-sm text-red-600">{oneTimeCreditsError}</p>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="edit-recurring-credits"
+                      className="text-sm font-medium text-slate-700"
+                    >
+                      Recurring Credits
+                    </Label>
+                    <Input
+                      id="edit-recurring-credits"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={MAX_CATEGORY_CREDITS_DIGITS}
+                      value={recurringCredits}
+                      onChange={(e) => {
+                        setSubmitError("");
+                        setShowCreditsError(false);
+                        setRecurringCredits(e.target.value.replace(/\D/g, "").slice(0, MAX_CATEGORY_CREDITS_DIGITS));
+                      }}
+                      placeholder="e.g. 100"
+                      disabled={updateCategory.isPending}
+                      className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
+                    />
+                    {recurringCreditsError ? (
+                      <p className="text-sm text-red-600">{recurringCreditsError}</p>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="edit-dollar-price"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Category Pricing ($)
+                  </Label>
+                  <Input
+                    id="edit-dollar-price"
+                    type="text"
+                    inputMode="decimal"
+                    value={dollarPrice}
+                    onChange={(e) => {
+                      setSubmitError("");
+                      const val = e.target.value.replace(/[^0-9.]/g, "");
+                      setDollarPrice(val);
+                    }}
+                    placeholder="e.g. 29.99"
+                    disabled={updateCategory.isPending}
+                    className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
+                  />
                 </div>
 
                 <div className="space-y-2">

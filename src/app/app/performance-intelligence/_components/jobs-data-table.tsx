@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTopJobs } from "@/features/insights/insights.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 
 function formatRank(index: number) {
   return String(index + 1).padStart(2, "0");
@@ -23,7 +24,13 @@ function formatRevenue(value: number) {
 }
 
 export default function JobsDataTable({ search = "" }: { search?: string }) {
-  const { data: jobs = [], isLoading, isError, error } = useTopJobs(10, search);
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+  const { data: jobs = [], isLoading, isError, error } = useTopJobs(
+    10,
+    search,
+    debouncedCity,
+    debouncedZipCode
+  );
 
   return (
     <div className="">

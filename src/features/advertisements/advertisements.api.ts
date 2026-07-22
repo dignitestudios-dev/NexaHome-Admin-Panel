@@ -7,6 +7,7 @@ import type {
   AdvertisementsListResult,
   CreateAdvertisementPayload,
   GetAdvertisementsParams,
+  UpdateAdvertisementPayload,
 } from "./advertisements.types";
 
 function normalizeAdvertisementsList(
@@ -82,6 +83,35 @@ export const advertisementsApi = {
       formData.append("addressDetails", JSON.stringify(addressDetails));
 
       const { data } = await API.post("/admin/advertisements", formData);
+      const payload = data?.data ?? data;
+      return (payload?.advertisement ?? payload) as Advertisement;
+    } catch (error) {
+      throw new Error(getApiErrorMessage(error));
+    }
+  },
+
+  updateAdvertisement: async ({
+    id,
+    link,
+    duration,
+    categoryId,
+    targetRadiusMiles,
+    isActive,
+    media,
+  }: UpdateAdvertisementPayload): Promise<Advertisement> => {
+    try {
+      const formData = new FormData();
+      if (link !== undefined) formData.append("link", link.trim());
+      if (duration) formData.append("duration", duration);
+      if (categoryId) formData.append("categoryId", categoryId);
+      if (targetRadiusMiles != null) formData.append("targetRadiusMiles", String(targetRadiusMiles));
+      if (isActive !== undefined) {
+        formData.append("status", isActive ? "active" : "inactive");
+        formData.append("isactive", String(isActive));
+      }
+      if (media) formData.append("media", media);
+
+      const { data } = await API.patch(`/admin/advertisements/${id}`, formData);
       const payload = data?.data ?? data;
       return (payload?.advertisement ?? payload) as Advertisement;
     } catch (error) {

@@ -1,9 +1,15 @@
 export type RevenueMonetizationGroupBy = "week" | "month" | "year";
 
+export interface RevenueMonetizationFilterParams {
+  city?: string;
+  zipCode?: string;
+}
+
 export interface RevenueMonetizationSummary {
   totalAdsRevenue: number;
   totalCategoryRevenue: number;
   totalLeadsRevenue: number;
+  totalTrustedExpertBadgeRevenue: number;
 }
 
 export interface RevenueMonetizationSeriesItem {
@@ -11,6 +17,8 @@ export interface RevenueMonetizationSeriesItem {
   adsRevenue: number;
   categoryRevenue: number;
   leadsRevenue: number;
+  trustedExpertBadgeRevenue?: number;
+  badgeRevenue?: number;
 }
 
 export interface RevenueMonetizationChartPoint {
@@ -18,6 +26,7 @@ export interface RevenueMonetizationChartPoint {
   ads: number;
   leads: number;
   pkg: number;
+  badge: number;
 }
 
 export interface RevenueMonetizationData {
@@ -28,6 +37,9 @@ export interface RevenueMonetizationData {
 
 export interface RevenueMonetizationApiResponse {
   groupBy?: RevenueMonetizationGroupBy;
-  summary?: Partial<RevenueMonetizationSummary>;
+  summary?: Partial<RevenueMonetizationSummary> & {
+    totalTrustedExpertBadgeRevenue?: number;
+    totalBadgeRevenue?: number;
+  };
   series?: RevenueMonetizationSeriesItem[];
 }

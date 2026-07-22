@@ -1,5 +1,6 @@
 import Sidebar from "./_components/sidebar";
 import Navbar from "./_components/navbar";
+import { FilterProvider } from "@/components/global/filter-context";
 
 export default function AppLayout({
   children,
@@ -7,18 +8,20 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex bg-[#004D54] max-h-screen overflow-y-auto">
-      {/* Sidebar */}
-      <Sidebar />
+    <FilterProvider>
+      <div className="flex bg-[#004D54] max-h-screen overflow-y-auto">
+        {/* Sidebar */}
+        <Sidebar />
 
-      {/* Main Content */}
-      <div className="flex-1 p-6 bg-[#EAFCFF] rounded-tl-[20px] rounded-bl-[20px] h-screen overflow-y-auto">
-        {/* Navbar */}
-        <Navbar />
+        {/* Main Content */}
+        <div className="flex-1 p-6 bg-[#EAFCFF] rounded-tl-[20px] rounded-bl-[20px] h-screen overflow-y-auto">
+          {/* Navbar */}
+          <Navbar />
 
-        {/* Page Content */}
-        <div className="mt-6">{children}</div>
+          {/* Page Content */}
+          <div className="mt-6">{children}</div>
+        </div>
       </div>
-    </div>
+    </FilterProvider>
   );
 }

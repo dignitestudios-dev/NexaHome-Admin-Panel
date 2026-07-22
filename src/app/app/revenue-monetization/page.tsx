@@ -20,7 +20,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { MdTrendingUp } from "react-icons/md";
+import { MdTrendingUp, MdVerified } from "react-icons/md";
 import { IoPeopleOutline } from "react-icons/io5";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import {
@@ -30,6 +30,7 @@ import {
   getYearlyChartYAxisMax,
 } from "@/features/revenue-monetization/revenue-monetization.api";
 import { useRevenueMonetization } from "@/features/revenue-monetization/revenue-monetization.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 import type { RevenueMonetizationGroupBy } from "@/features/revenue-monetization/revenue-monetization.types";
 
 const GROUP_BY_LABELS: Record<RevenueMonetizationGroupBy, string> = {
@@ -40,7 +41,11 @@ const GROUP_BY_LABELS: Record<RevenueMonetizationGroupBy, string> = {
 
 export default function RevenueDashboard() {
   const [groupBy, setGroupBy] = useState<RevenueMonetizationGroupBy>("month");
-  const { data, isLoading, isError, error } = useRevenueMonetization(groupBy);
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+  const { data, isLoading, isError, error } = useRevenueMonetization(groupBy, {
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
+  });
 
   const chartData = data?.series ?? [];
   const summary = data?.summary;
@@ -62,6 +67,7 @@ export default function RevenueDashboard() {
       ads: "Ads Revenue",
       leads: "Leads Revenue",
       pkg: "Category Package",
+      badge: "Trusted Expert Badge Revenue",
     };
     const amount = Number(value) || 0;
     const key = String(name);
@@ -86,6 +92,11 @@ export default function RevenueDashboard() {
       value: formatRevenueAmount(summary?.totalCategoryRevenue ?? 0),
       icon: RiMoneyDollarCircleLine,
     },
+    {
+      title: "Trusted Expert Badge Revenue",
+      value: formatRevenueAmount(summary?.totalTrustedExpertBadgeRevenue ?? 0),
+      icon: MdVerified,
+    },
   ];
 
   return (
@@ -94,19 +105,19 @@ export default function RevenueDashboard() {
         Revenue and Monetization
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((item, i) => (
           <Card
             key={i}
             className="border-none shadow-none rounded-[24px] bg-white"
           >
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="bg-[#00586417] p-3 rounded-2xl shadow-sm text-[#005864] flex items-center justify-center">
+              <div className="bg-[#00586417] p-3 rounded-2xl shadow-sm text-[#005864] flex items-center justify-center shrink-0">
                 <item.icon size={24} />
               </div>
-              <div>
-                <p className="text-[11px] font-medium mb-0.5">{item.title}</p>
-                <h2 className="text-2xl font-semibold text-[#1A1A1A] tracking-tight">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-medium mb-0.5 truncate">{item.title}</p>
+                <h2 className="text-2xl font-semibold text-[#1A1A1A] tracking-tight truncate">
                   {isLoading ? "..." : item.value}
                 </h2>
               </div>
@@ -147,6 +158,12 @@ export default function RevenueDashboard() {
                     <div className="w-3 h-3 bg-[#D980FA] rounded-[3px]" />
                     <span className="text-[11px] font-medium text-gray-500">
                       Adv. Category Package
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-[#10B981] rounded-[3px]" />
+                    <span className="text-[11px] font-medium text-gray-500">
+                      Trusted Expert Badge
                     </span>
                   </div>
                 </>
@@ -273,6 +290,16 @@ export default function RevenueDashboard() {
                     type="monotone"
                     dataKey="pkg"
                     stroke="#D980FA"
+                    strokeWidth={2}
+                    strokeDasharray="8 5"
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+
+                  <Line
+                    type="monotone"
+                    dataKey="badge"
+                    stroke="#10B981"
                     strokeWidth={2}
                     strokeDasharray="8 5"
                     dot={false}

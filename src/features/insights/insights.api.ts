@@ -17,14 +17,27 @@ import type {
   TopLocation,
 } from "./insights.types";
 
+function appendLocationParams(
+  params: Record<string, string | number>,
+  city?: string,
+  zipCode?: string
+) {
+  if (city?.trim()) params.city = city.trim();
+  if (zipCode?.trim()) params.zipCode = zipCode.trim();
+  return params;
+}
+
 export const insightsApi = {
   getTopJobs: async ({
     limit = 10,
     search,
+    city,
+    zipCode,
   }: InsightsListParams = {}): Promise<TopJob[]> => {
     try {
       const params: Record<string, string | number> = { limit };
       if (search?.trim()) params.search = search.trim();
+      appendLocationParams(params, city, zipCode);
 
       const { data } = await API.get("/admin/insights/top-jobs", { params });
       const payload = data?.data ?? data;
@@ -37,10 +50,13 @@ export const insightsApi = {
   getTopLocations: async ({
     limit = 10,
     search,
+    city,
+    zipCode,
   }: InsightsListParams = {}): Promise<TopLocation[]> => {
     try {
       const params: Record<string, string | number> = { limit };
       if (search?.trim()) params.search = search.trim();
+      appendLocationParams(params, city, zipCode);
 
       const { data } = await API.get("/admin/insights/top-locations", { params });
       const payload = data?.data ?? data;
@@ -53,10 +69,13 @@ export const insightsApi = {
   getTopHomeowners: async ({
     limit = 10,
     search,
+    city,
+    zipCode,
   }: InsightsListParams = {}): Promise<TopHomeowner[]> => {
     try {
       const params: Record<string, string | number> = { limit };
       if (search?.trim()) params.search = search.trim();
+      appendLocationParams(params, city, zipCode);
 
       const { data } = await API.get("/admin/insights/top-homeowners", { params });
       const payload = data?.data ?? data;
@@ -69,10 +88,13 @@ export const insightsApi = {
   getTopExperts: async ({
     limit = 10,
     search,
+    city,
+    zipCode,
   }: InsightsListParams = {}): Promise<TopExpert[]> => {
     try {
       const params: Record<string, string | number> = { limit };
       if (search?.trim()) params.search = search.trim();
+      appendLocationParams(params, city, zipCode);
 
       const { data } = await API.get("/admin/insights/top-experts", { params });
       const payload = data?.data ?? data;
@@ -86,10 +108,13 @@ export const insightsApi = {
     page = 1,
     limit = 10,
     search,
+    city,
+    zipCode,
   }: GetTopCategoriesByExpertsParams = {}): Promise<TopCategoriesByExpertsResult> => {
     try {
       const params: Record<string, string | number> = { page, limit };
       if (search?.trim()) params.search = search.trim();
+      appendLocationParams(params, city, zipCode);
 
       const { data } = await API.get<TopCategoriesByExpertsResponse>(
         "/admin/insights/top-categories-by-experts",
@@ -115,9 +140,18 @@ export const insightsApi = {
     }
   },
 
-  getLeadPerformance: async (): Promise<LeadPerformanceStats> => {
+  getLeadPerformance: async (filters?: {
+    city?: string;
+    zipCode?: string;
+  }): Promise<LeadPerformanceStats> => {
     try {
-      const { data } = await API.get("/admin/insights/lead-performance");
+      const params: Record<string, string> = {};
+      if (filters?.city?.trim()) params.city = filters.city.trim();
+      if (filters?.zipCode?.trim()) params.zipCode = filters.zipCode.trim();
+
+      const { data } = await API.get("/admin/insights/lead-performance", {
+        params,
+      });
       const payload = (data?.data ?? data) as LeadPerformanceStats;
       return {
         categoriesWithExperts: payload?.categoriesWithExperts ?? 0,

@@ -3,6 +3,7 @@
 import React from "react";
 import { ClipboardList, Grid2x2, TrendingUp } from "lucide-react";
 import { useLeadPerformance } from "@/features/insights/insights.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 
 type StatItem = {
   title: string;
@@ -17,7 +18,11 @@ const statConfig: StatItem[] = [
 ];
 
 const Stats = () => {
-  const { data, isLoading, isError } = useLeadPerformance();
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+  const { data, isLoading, isError } = useLeadPerformance({
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
+  });
 
   const apiStats: StatItem[] = [
     {

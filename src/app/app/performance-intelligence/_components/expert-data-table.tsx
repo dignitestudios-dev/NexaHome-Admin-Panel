@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTopExperts } from "@/features/insights/insights.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 
 function formatRank(index: number) {
   return String(index + 1).padStart(2, "0");
@@ -23,8 +24,9 @@ function formatRevenue(value?: number) {
 }
 
 export default function ExpertDataTable({ search = "" }: { search?: string }) {
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
   const { data: experts = [], isLoading, isError, error } =
-    useTopExperts(10, search);
+    useTopExperts(10, search, debouncedCity, debouncedZipCode);
 
   return (
     <div className="">

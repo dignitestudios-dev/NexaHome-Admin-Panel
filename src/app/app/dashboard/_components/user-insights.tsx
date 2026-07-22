@@ -10,6 +10,7 @@ import {
   PolarAngleAxis,
 } from "recharts";
 import { useDashboardInsights } from "@/features/dashboard/dashboard.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 
 const Donut = ({
   value,
@@ -54,17 +55,44 @@ const Donut = ({
 };
 
 const UserInsights: React.FC = () => {
-  const { data, isLoading, isError, error } = useDashboardInsights();
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+  const { data, isLoading, isError, error } = useDashboardInsights({
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
+  });
 
   const insightsData = [
-    { label: "Active Users", value: data?.activeUsersPercent ?? 0 },
-    { label: "Repeat Homeowners", value: data?.repeatHomeownersPercent ?? 0 },
-    { label: "Completed Jobs", value: data?.completedJobsPercent ?? 0 },
+    {
+      label: "Active Users",
+      value: data?.activeUsersPercent ?? 0,
+      count: data?.activeUsersCount,
+      total: data?.activeUsersTotal,
+    },
+    {
+      label: "Repeat Homeowners",
+      value: data?.repeatHomeownersPercent ?? 0,
+      count: data?.repeatHomeownersCount,
+      total: data?.repeatHomeownersTotal,
+    },
+    {
+      label: "Completed Jobs",
+      value: data?.completedJobsPercent ?? 0,
+      count: data?.completedJobsCount,
+      total: data?.completedJobsTotal,
+    },
   ];
 
   const averageRating = data?.averageRating ?? 0;
   // Map a 0-5 rating to a 0-100 ring fill.
   const ratingPercent = (averageRating / 5) * 100;
+
+  const renderValueText = (item: (typeof insightsData)[0]) => {
+    if (isLoading) return "—";
+    if (item.count != null && item.total != null) {
+      return `${item.value}% (${item.count} of ${item.total})`;
+    }
+    return `${item.value}%`;
+  };
 
   return (
     <Card className="rounded-[40px] border-none shadow-sm h-[400px] flex flex-row overflow-hidden w-full bg-white">
@@ -86,12 +114,12 @@ const UserInsights: React.FC = () => {
                 </div>
 
                 {/* Label */}
-                <div className="bg-[#F0F5F6] rounded-[20px] px-2 py-4 text-center">
+                <div className="bg-[#F0F5F6] rounded-[20px] px-2 py-3 text-center">
                   <p className="text-[11px] font-semibold text-gray-600 mb-0.5 leading-none whitespace-nowrap">
                     {item.label}
                   </p>
-                  <p className="text-2xl font-black pt-1 text-[#065662]">
-                    {isLoading ? "—" : `${item.value}%`}
+                  <p className="text-xl font-black pt-1 text-[#065662] truncate">
+                    {renderValueText(item)}
                   </p>
                 </div>
               </div>

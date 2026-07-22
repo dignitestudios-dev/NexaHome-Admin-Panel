@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTopHomeowners } from "@/features/insights/insights.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 
 function formatRank(index: number) {
   return String(index + 1).padStart(2, "0");
@@ -26,8 +27,9 @@ function getInitials(name?: string) {
 }
 
 export default function HomeOwnersDataTable({ search = "" }: { search?: string }) {
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
   const { data: homeowners = [], isLoading, isError, error } =
-    useTopHomeowners(10, search);
+    useTopHomeowners(10, search, debouncedCity, debouncedZipCode);
 
   return (
     <div className="">

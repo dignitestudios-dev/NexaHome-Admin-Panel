@@ -3,6 +3,7 @@ import { advertisementsApi } from "./advertisements.api";
 import type {
   CreateAdvertisementPayload,
   GetAdvertisementsParams,
+  UpdateAdvertisementPayload,
 } from "./advertisements.types";
 
 export const advertisementKeys = {
@@ -27,6 +28,18 @@ export function useCreateAdvertisement() {
   return useMutation({
     mutationFn: (payload: CreateAdvertisementPayload) =>
       advertisementsApi.createAdvertisement(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: advertisementKeys.all });
+    },
+  });
+}
+
+export function useUpdateAdvertisement() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: UpdateAdvertisementPayload) =>
+      advertisementsApi.updateAdvertisement(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: advertisementKeys.all });
     },

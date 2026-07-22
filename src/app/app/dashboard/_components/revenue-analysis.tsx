@@ -21,11 +21,16 @@ import {
 } from "recharts";
 
 import { useRevenueAnalysis } from "@/features/dashboard/dashboard.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 import type { RevenueGroupBy } from "@/features/dashboard/dashboard.types";
 
 const RevenueAnalysis = () => {
   const [groupBy, setGroupBy] = useState<RevenueGroupBy>("month");
-  const { data, isLoading, isError, error } = useRevenueAnalysis(groupBy);
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+  const { data, isLoading, isError, error } = useRevenueAnalysis(groupBy, {
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
+  });
 
   const chartData = data ?? [];
 

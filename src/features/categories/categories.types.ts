@@ -68,6 +68,9 @@ export interface UpdateCategoryPayload {
   name: string;
   description?: string;
   icon?: File;
+  oneTimeCredits?: number;
+  recurringCredits?: number;
+  dollarPrice?: number;
   isActive: boolean;
 }
 

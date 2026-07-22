@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import Pagination from "@/components/global/pagination";
 import { useTopCategoriesByExperts } from "@/features/insights/insights.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 
 type DataTableProps = {
   search?: string;
@@ -20,15 +21,18 @@ const ITEMS_PER_PAGE = 10;
 
 export default function DataTable({ search = "" }: DataTableProps) {
   const [page, setPage] = useState(1);
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
   const { data, isLoading, isError, error } = useTopCategoriesByExperts({
     page,
     limit: ITEMS_PER_PAGE,
     search,
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
   });
 
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [search, debouncedCity, debouncedZipCode]);
 
   const categories = data?.categories ?? [];
   const totalPages = data?.totalPages ?? 1;

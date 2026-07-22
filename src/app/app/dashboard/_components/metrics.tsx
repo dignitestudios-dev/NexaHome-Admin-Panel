@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { useDashboardSummary } from "@/features/dashboard/dashboard.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 import type { MetricStat } from "@/features/dashboard/dashboard.types";
 
 type StatConfig = {
@@ -47,7 +48,11 @@ function formatTrend(stat?: MetricStat) {
 }
 
 const Metrics = () => {
-  const { data, isLoading, isError, error } = useDashboardSummary();
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+  const { data, isLoading, isError, error } = useDashboardSummary({
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
+  });
 
   if (isError) {
     return (

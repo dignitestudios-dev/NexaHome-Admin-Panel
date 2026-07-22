@@ -22,6 +22,16 @@ export interface CreateAdvertisementPayload {
   addressDetails: AddressDetails;
 }
 
+export interface UpdateAdvertisementPayload {
+  id: string;
+  link?: string;
+  duration?: AdvertisementDuration | string;
+  categoryId?: string;
+  targetRadiusMiles?: number;
+  isActive?: boolean;
+  media?: File;
+}
+
 export interface AdvertisementCategory {
   _id: string;
   name: string;

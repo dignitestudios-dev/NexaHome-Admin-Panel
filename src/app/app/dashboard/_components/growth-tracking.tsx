@@ -23,11 +23,16 @@ import {
 } from "recharts";
 
 import { useGrowthTracking } from "@/features/dashboard/dashboard.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 import type { RevenueGroupBy } from "@/features/dashboard/dashboard.types";
 
 const GrowthTracking = () => {
   const [groupBy, setGroupBy] = useState<RevenueGroupBy>("month");
-  const { data, isLoading, isError, error } = useGrowthTracking(groupBy);
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+  const { data, isLoading, isError, error } = useGrowthTracking(groupBy, {
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
+  });
 
   const chartData = data ?? [];
 

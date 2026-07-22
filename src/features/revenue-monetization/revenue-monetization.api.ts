@@ -5,6 +5,7 @@ import type {
   RevenueMonetizationApiResponse,
   RevenueMonetizationChartPoint,
   RevenueMonetizationData,
+  RevenueMonetizationFilterParams,
   RevenueMonetizationGroupBy,
   RevenueMonetizationSummary,
 } from "./revenue-monetization.types";
@@ -52,7 +53,6 @@ function startOfCurrentWeekMonday(now = new Date()): Date {
   return date;
 }
 
-/** Current calendar week only: Monday → Sunday. */
 function buildCurrentWeekSlots<T>(
   series: unknown[],
   extract: (item: Record<string, unknown>) => T,
@@ -77,15 +77,26 @@ function buildCurrentWeekSlots<T>(
   return slots;
 }
 
+function extractSeriesPoint(item: Record<string, unknown>) {
+  return {
+    ads: Number(item.adsRevenue) || 0,
+    leads: Number(item.leadsRevenue) || 0,
+    pkg: Number(item.categoryRevenue) || 0,
+    badge:
+      Number(
+        item.trustedExpertBadgeRevenue ??
+          item.badgeRevenue ??
+          item.trustedExpertRevenue ??
+          0
+      ) || 0,
+  };
+}
+
 function normalizeWeekSeries(series: unknown[]): RevenueMonetizationChartPoint[] {
   const slots = buildCurrentWeekSlots(
     series,
-    (item) => ({
-      ads: Number(item.adsRevenue) || 0,
-      leads: Number(item.leadsRevenue) || 0,
-      pkg: Number(item.categoryRevenue) || 0,
-    }),
-    { ads: 0, leads: 0, pkg: 0 }
+    extractSeriesPoint,
+    { ads: 0, leads: 0, pkg: 0, badge: 0 }
   );
 
   return DAY_LETTERS_MON_TO_SUN.map((name, index) => ({
@@ -93,6 +104,7 @@ function normalizeWeekSeries(series: unknown[]): RevenueMonetizationChartPoint[]
     ads: slots[index]?.ads ?? 0,
     leads: slots[index]?.leads ?? 0,
     pkg: slots[index]?.pkg ?? 0,
+    badge: slots[index]?.badge ?? 0,
   }));
 }
 
@@ -103,14 +115,6 @@ function formatMonthPeriodLabel(period: string): string {
   return `${MONTH_NAMES[monthIndex] ?? month} ${year}`;
 }
 
-function extractSeriesPoint(item: Record<string, unknown>) {
-  return {
-    ads: Number(item.adsRevenue) || 0,
-    leads: Number(item.leadsRevenue) || 0,
-    pkg: Number(item.categoryRevenue) || 0,
-  };
-}
-
 function normalizeMonthSeries(series: unknown[]): RevenueMonetizationChartPoint[] {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -118,7 +122,7 @@ function normalizeMonthSeries(series: unknown[]): RevenueMonetizationChartPoint[
 
   const dataMap = new Map<
     string,
-    { ads: number; leads: number; pkg: number }
+    { ads: number; leads: number; pkg: number; badge: number }
   >();
 
   for (const raw of series) {
@@ -143,7 +147,7 @@ function normalizeMonthSeries(series: unknown[]): RevenueMonetizationChartPoint[
 
   for (let month = currentMonth; month <= 12; month++) {
     const period = `${currentYear}-${String(month).padStart(2, "0")}`;
-    const point = dataMap.get(period) ?? { ads: 0, leads: 0, pkg: 0 };
+    const point = dataMap.get(period) ?? { ads: 0, leads: 0, pkg: 0, badge: 0 };
 
     result.push({
       name: formatMonthPeriodLabel(period),
@@ -183,12 +187,21 @@ function formatPeriodLabel(
 }
 
 function normalizeSummary(
-  summary?: Partial<RevenueMonetizationSummary>
+  summary?: Partial<RevenueMonetizationSummary> & {
+    totalTrustedExpertBadgeRevenue?: number;
+    totalBadgeRevenue?: number;
+  }
 ): RevenueMonetizationSummary {
   return {
     totalAdsRevenue: Number(summary?.totalAdsRevenue) || 0,
     totalCategoryRevenue: Number(summary?.totalCategoryRevenue) || 0,
     totalLeadsRevenue: Number(summary?.totalLeadsRevenue) || 0,
+    totalTrustedExpertBadgeRevenue:
+      Number(
+        summary?.totalTrustedExpertBadgeRevenue ??
+          summary?.totalBadgeRevenue ??
+          0
+      ) || 0,
   };
 }
 
@@ -209,12 +222,11 @@ function normalizeSeries(
   return series.map((raw) => {
     const item = (raw ?? {}) as Record<string, unknown>;
     const period = String(item.period ?? "");
+    const point = extractSeriesPoint(item);
 
     return {
       name: formatPeriodLabel(period, groupBy),
-      ads: Number(item.adsRevenue) || 0,
-      leads: Number(item.leadsRevenue) || 0,
-      pkg: Number(item.categoryRevenue) || 0,
+      ...point,
     };
   });
 }
@@ -235,11 +247,16 @@ function normalizeRevenueMonetization(
 
 export const revenueMonetizationApi = {
   getRevenueMonetization: async (
-    groupBy: RevenueMonetizationGroupBy
+    groupBy: RevenueMonetizationGroupBy,
+    filters?: RevenueMonetizationFilterParams
   ): Promise<RevenueMonetizationData> => {
     try {
+      const params: Record<string, string> = { groupBy };
+      if (filters?.city?.trim()) params.city = filters.city.trim();
+      if (filters?.zipCode?.trim()) params.zipCode = filters.zipCode.trim();
+
       const { data } = await API.get("/admin/revenue-monetization", {
-        params: { groupBy },
+        params,
       });
       return normalizeRevenueMonetization(data, groupBy);
     } catch (error) {
@@ -254,7 +271,7 @@ export function formatRevenueAmount(value: number) {
 
 export function getChartYAxisMax(series: RevenueMonetizationChartPoint[]) {
   const maxValue = series.reduce((max, point) => {
-    const pointMax = Math.max(point.ads, point.leads, point.pkg);
+    const pointMax = Math.max(point.ads, point.leads, point.pkg, point.badge);
     return Math.max(max, pointMax);
   }, 0);
 
@@ -273,7 +290,7 @@ export interface RevenueMonetizationYearlyChartPoint {
 export function getYearlyChartData(series: RevenueMonetizationChartPoint[]) {
   return series.map((point) => ({
     name: point.name,
-    revenue: point.ads + point.leads + point.pkg,
+    revenue: point.ads + point.leads + point.pkg + point.badge,
   }));
 }
 

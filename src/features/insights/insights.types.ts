@@ -12,10 +12,17 @@ export interface TopJobsResponse {
 export interface InsightsListParams {
   limit?: number;
   search?: string;
+  city?: string;
+  zipCode?: string;
 }
 
 export interface TopLocation {
-  state: string;
+  city?: string;
+  zipCode?: string;
+  zip?: string;
+  state?: string;
+  name?: string;
+  location?: string;
   totalJobs: number;
   revenue: number;
 }
@@ -85,6 +92,8 @@ export interface GetTopCategoriesByExpertsParams {
   page?: number;
   limit?: number;
   search?: string;
+  city?: string;
+  zipCode?: string;
 }
 
 export interface TopCategoriesByExpertsResult {

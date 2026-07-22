@@ -125,7 +125,8 @@ export default function DailyAdsTable({
                         type="button"
                         onClick={() => handleViewClick(ad)}
                         className={`${actionButtonClass} bg-[#F0F5F6] text-[#005864] hover:bg-[#e2eced]`}
-                        aria-label="View ad details"
+                        aria-label="Manage ad"
+                        title="Manage / Edit Ad"
                       >
                         <Eye size={18} />
                       </button>

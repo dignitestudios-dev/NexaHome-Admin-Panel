@@ -1,54 +1,82 @@
 import { useQuery } from "@tanstack/react-query";
 import { insightsApi } from "./insights.api";
 
-export function useTopJobs(limit = 10, search?: string) {
+export function useTopJobs(
+  limit = 10,
+  search?: string,
+  city?: string,
+  zipCode?: string
+) {
   const normalizedSearch = search?.trim() ?? "";
 
   return useQuery({
-    queryKey: ["insights", "top-jobs", limit, normalizedSearch],
+    queryKey: ["insights", "top-jobs", limit, normalizedSearch, city, zipCode],
     queryFn: () =>
       insightsApi.getTopJobs({
         limit,
         search: normalizedSearch || undefined,
+        city,
+        zipCode,
       }),
   });
 }
 
-export function useTopLocations(limit = 10, search?: string) {
+export function useTopLocations(
+  limit = 10,
+  search?: string,
+  city?: string,
+  zipCode?: string
+) {
   const normalizedSearch = search?.trim() ?? "";
 
   return useQuery({
-    queryKey: ["insights", "top-locations", limit, normalizedSearch],
+    queryKey: ["insights", "top-locations", limit, normalizedSearch, city, zipCode],
     queryFn: () =>
       insightsApi.getTopLocations({
         limit,
         search: normalizedSearch || undefined,
+        city,
+        zipCode,
       }),
   });
 }
 
-export function useTopHomeowners(limit = 10, search?: string) {
+export function useTopHomeowners(
+  limit = 10,
+  search?: string,
+  city?: string,
+  zipCode?: string
+) {
   const normalizedSearch = search?.trim() ?? "";
 
   return useQuery({
-    queryKey: ["insights", "top-homeowners", limit, normalizedSearch],
+    queryKey: ["insights", "top-homeowners", limit, normalizedSearch, city, zipCode],
     queryFn: () =>
       insightsApi.getTopHomeowners({
         limit,
         search: normalizedSearch || undefined,
+        city,
+        zipCode,
       }),
   });
 }
 
-export function useTopExperts(limit = 10, search?: string) {
+export function useTopExperts(
+  limit = 10,
+  search?: string,
+  city?: string,
+  zipCode?: string
+) {
   const normalizedSearch = search?.trim() ?? "";
 
   return useQuery({
-    queryKey: ["insights", "top-experts", limit, normalizedSearch],
+    queryKey: ["insights", "top-experts", limit, normalizedSearch, city, zipCode],
     queryFn: () =>
       insightsApi.getTopExperts({
         limit,
         search: normalizedSearch || undefined,
+        city,
+        zipCode,
       }),
   });
 }
@@ -58,7 +86,15 @@ export function useTopCategoriesByExperts(
     page = 1,
     limit = 10,
     search,
-  }: { page?: number; limit?: number; search?: string } = {},
+    city,
+    zipCode,
+  }: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    city?: string;
+    zipCode?: string;
+  } = {},
   enabled = true
 ) {
   const normalizedSearch = search?.trim() ?? "";
@@ -70,21 +106,25 @@ export function useTopCategoriesByExperts(
       page,
       limit,
       normalizedSearch,
+      city,
+      zipCode,
     ],
     queryFn: () =>
       insightsApi.getTopCategoriesByExperts({
         page,
         limit,
         search: normalizedSearch || undefined,
+        city,
+        zipCode,
       }),
     enabled,
   });
 }
 
-export function useLeadPerformance() {
+export function useLeadPerformance(filters?: { city?: string; zipCode?: string }) {
   return useQuery({
-    queryKey: ["insights", "lead-performance"],
-    queryFn: () => insightsApi.getLeadPerformance(),
+    queryKey: ["insights", "lead-performance", filters?.city, filters?.zipCode],
+    queryFn: () => insightsApi.getLeadPerformance(filters),
   });
 }
 

@@ -164,6 +164,9 @@ export const categoriesApi = {
     name,
     description,
     icon,
+    oneTimeCredits,
+    recurringCredits,
+    dollarPrice,
     isActive,
   }: UpdateCategoryPayload): Promise<Category> => {
     try {
@@ -174,6 +177,16 @@ export const categoriesApi = {
       }
       if (icon) {
         formData.append("icon", icon);
+      }
+      if (oneTimeCredits != null) {
+        formData.append("oneTimeCredits", String(oneTimeCredits));
+      }
+      if (recurringCredits != null) {
+        formData.append("recurringCredits", String(recurringCredits));
+      }
+      if (dollarPrice != null) {
+        formData.append("dollarPrice", String(dollarPrice));
+        formData.append("price", String(dollarPrice));
       }
       formData.append("isactive", String(isActive));
 

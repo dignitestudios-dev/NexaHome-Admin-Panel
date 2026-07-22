@@ -1,6 +1,7 @@
 import { API } from "@/lib/axios";
 import { getApiErrorMessage } from "@/lib/api/error";
 import type {
+  DashboardFilterParams,
   DashboardInsights,
   DashboardSummary,
   GrowthPoint,
@@ -234,28 +235,41 @@ function normalizeDashboardSummary(payload: unknown): DashboardSummary {
   };
 }
 
+function buildFilterParams(filters?: DashboardFilterParams) {
+  const params: Record<string, string> = {};
+  if (filters?.city?.trim()) params.city = filters.city.trim();
+  if (filters?.zipCode?.trim()) params.zipCode = filters.zipCode.trim();
+  return params;
+}
+
 export const dashboardApi = {
-  getSummary: async (): Promise<DashboardSummary> => {
+  getSummary: async (filters?: DashboardFilterParams): Promise<DashboardSummary> => {
     try {
-      const { data } = await API.get("/admin/dashboard/summary");
+      const { data } = await API.get("/admin/dashboard/summary", {
+        params: buildFilterParams(filters),
+      });
       return normalizeDashboardSummary(data);
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
     }
   },
 
-  getInsights: async (): Promise<DashboardInsights> => {
+  getInsights: async (filters?: DashboardFilterParams): Promise<DashboardInsights> => {
     try {
-      const { data } = await API.get("/admin/dashboard/insights");
+      const { data } = await API.get("/admin/dashboard/insights", {
+        params: buildFilterParams(filters),
+      });
       return (data?.data ?? data) as DashboardInsights;
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
     }
   },
 
-  getPopularCategories: async (): Promise<PopularCategoriesResponse> => {
+  getPopularCategories: async (filters?: DashboardFilterParams): Promise<PopularCategoriesResponse> => {
     try {
-      const { data } = await API.get("/admin/dashboard/popular-categories");
+      const { data } = await API.get("/admin/dashboard/popular-categories", {
+        params: buildFilterParams(filters),
+      });
       return (data?.data ?? data) as PopularCategoriesResponse;
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
@@ -263,11 +277,12 @@ export const dashboardApi = {
   },
 
   getRevenueAnalysis: async (
-    groupBy: RevenueGroupBy
+    groupBy: RevenueGroupBy,
+    filters?: DashboardFilterParams
   ): Promise<RevenuePoint[]> => {
     try {
       const { data } = await API.get("/admin/dashboard/revenue-analysis", {
-        params: { groupBy },
+        params: { groupBy, ...buildFilterParams(filters) },
       });
       return normalizeRevenue(data, groupBy);
     } catch (error) {
@@ -276,11 +291,12 @@ export const dashboardApi = {
   },
 
   getGrowthTracking: async (
-    groupBy: RevenueGroupBy
+    groupBy: RevenueGroupBy,
+    filters?: DashboardFilterParams
   ): Promise<GrowthPoint[]> => {
     try {
       const { data } = await API.get("/admin/dashboard/growth-tracking", {
-        params: { groupBy },
+        params: { groupBy, ...buildFilterParams(filters) },
       });
       const root = (data?.data ?? data) as Record<string, unknown>;
       const series = Array.isArray(root) ? root : root?.series ?? [];

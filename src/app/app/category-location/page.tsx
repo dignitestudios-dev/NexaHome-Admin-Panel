@@ -160,20 +160,28 @@ import { DataTable } from "./_components/data-table";
 import { useTopCategoriesByExperts } from "@/features/insights/insights.hooks";
 import { usePopularCategories } from "@/features/dashboard/dashboard.hooks";
 import { useTopLocations } from "@/features/insights/insights.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
 
 const LOCATIONS_PER_PAGE = 10;
 
 export default function InsightsPage() {
   const [locationsPage, setLocationsPage] = useState(1);
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
+
   const {
     data: popularCategoriesData,
     isLoading: isPopularCategoriesLoading,
     isError: isPopularCategoriesError,
     error: popularCategoriesError,
-  } = usePopularCategories();
+  } = usePopularCategories({
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
+  });
   const { data: categoriesByExpertsData } = useTopCategoriesByExperts({
     page: 1,
     limit: 10,
+    city: debouncedCity,
+    zipCode: debouncedZipCode,
   });
   const categoriesByExperts = categoriesByExpertsData?.categories ?? [];
   const {
@@ -181,12 +189,17 @@ export default function InsightsPage() {
     isLoading: isTopLocationsLoading,
     isError: isTopLocationsError,
     error: topLocationsError,
-  } = useTopLocations();
-  const tableData = topLocations.map((location) => ({
-    area: location.state,
-    totalJobs: location.totalJobs,
-    demand: location.revenue,
-  }));
+  } = useTopLocations(10, undefined, debouncedCity, debouncedZipCode);
+
+  const tableData = topLocations.map((location) => {
+    const cityName = location.city || location.name || location.state || "—";
+    const zip = location.zipCode || location.zip;
+    return {
+      area: zip ? `${cityName} - ${zip}` : cityName,
+      totalJobs: location.totalJobs,
+      demand: location.revenue,
+    };
+  });
   const totalLocationPages = Math.max(
     1,
     Math.ceil(tableData.length / LOCATIONS_PER_PAGE)

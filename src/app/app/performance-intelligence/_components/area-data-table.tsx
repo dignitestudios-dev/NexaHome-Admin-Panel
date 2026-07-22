@@ -9,6 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTopLocations } from "@/features/insights/insights.hooks";
+import { useDashboardFilters } from "@/components/global/filter-context";
+import type { TopLocation } from "@/features/insights/insights.types";
 
 function formatRank(index: number) {
   return String(index + 1).padStart(2, "0");
@@ -22,9 +24,16 @@ function formatRevenue(value: number) {
   }).format(value);
 }
 
+function formatLocationName(location: TopLocation) {
+  const cityName = location.city || location.name || location.state || "—";
+  const zip = location.zipCode || location.zip;
+  return zip ? `${cityName} - ${zip}` : cityName;
+}
+
 export default function AreaDataTable({ search = "" }: { search?: string }) {
+  const { debouncedCity, debouncedZipCode } = useDashboardFilters();
   const { data: locations = [], isLoading, isError, error } =
-    useTopLocations(10, search);
+    useTopLocations(10, search, debouncedCity, debouncedZipCode);
 
   return (
     <div className="">
@@ -61,9 +70,9 @@ export default function AreaDataTable({ search = "" }: { search?: string }) {
               </TableRow>
             ) : locations.length ? (
               locations.map((location, index) => (
-                <TableRow key={location.state} className="">
+                <TableRow key={location.city || location.state || index} className="">
                   <TableCell className="font-medium">{formatRank(index)}</TableCell>
-                  <TableCell className="capitalize">{location.state}</TableCell>
+                  <TableCell className="capitalize">{formatLocationName(location)}</TableCell>
                   <TableCell>{location.totalJobs}</TableCell>
                   <TableCell className="font-semibold">
                     {formatRevenue(location.revenue)}

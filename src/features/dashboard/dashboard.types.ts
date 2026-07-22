@@ -1,3 +1,8 @@
+export interface DashboardFilterParams {
+  city?: string;
+  zipCode?: string;
+}
+
 export interface MetricStat {
   value: number;
   increasePercentThisMonth: number;
@@ -12,8 +17,14 @@ export interface DashboardSummary {
 
 export interface DashboardInsights {
   activeUsersPercent: number;
+  activeUsersCount?: number;
+  activeUsersTotal?: number;
   repeatHomeownersPercent: number;
+  repeatHomeownersCount?: number;
+  repeatHomeownersTotal?: number;
   completedJobsPercent: number;
+  completedJobsCount?: number;
+  completedJobsTotal?: number;
   averageRating: number;
 }
 
