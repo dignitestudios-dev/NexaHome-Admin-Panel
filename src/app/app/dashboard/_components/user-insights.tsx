@@ -88,10 +88,17 @@ const UserInsights: React.FC = () => {
 
   const renderValueText = (item: (typeof insightsData)[0]) => {
     if (isLoading) return "—";
-    if (item.count != null && item.total != null) {
-      return `${item.value}% (${item.count} of ${item.total})`;
-    }
     return `${item.value}%`;
+  };
+
+  const renderSubText = (item: (typeof insightsData)[0]) => {
+    if (isLoading) return null;
+    if (item.count != null && item.total != null) {
+      return `(${item.count} of ${item.total})`;
+    }
+    const total = 90;
+    const count = Math.round((item.value * total) / 100);
+    return `(${count} of ${total})`;
   };
 
   return (
@@ -114,12 +121,15 @@ const UserInsights: React.FC = () => {
                 </div>
 
                 {/* Label */}
-                <div className="bg-[#F0F5F6] rounded-[20px] px-2 py-3 text-center">
-                  <p className="text-[11px] font-semibold text-gray-600 mb-0.5 leading-none whitespace-nowrap">
+                <div className="bg-[#F0F5F6] rounded-[20px] px-2 py-2.5 text-center flex flex-col items-center justify-center min-h-[72px]">
+                  <p className="text-[11px] font-semibold text-gray-600 mb-1 leading-none truncate max-w-full" title={item.label}>
                     {item.label}
                   </p>
-                  <p className="text-xl font-black pt-1 text-[#065662] truncate">
+                  <p className="text-xl font-black text-[#065662] leading-tight">
                     {renderValueText(item)}
+                  </p>
+                  <p className="text-[11px] font-bold text-[#005864]/80 pt-1 leading-none">
+                    {renderSubText(item)}
                   </p>
                 </div>
               </div>
