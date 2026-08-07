@@ -17,14 +17,12 @@ export interface InsightsListParams {
 }
 
 export interface TopLocation {
-  city?: string;
-  zipCode?: string;
-  zip?: string;
   state?: string;
-  name?: string;
-  location?: string;
-  totalJobs: number;
-  revenue: number;
+  city?: string;
+  country?: string;
+  zipCode?: string;
+  totalJobs?: number;
+  revenue?: number;
 }
 
 export interface TopLocationsResponse {

@@ -25,9 +25,13 @@ function formatRevenue(value: number) {
 }
 
 function formatLocationName(location: TopLocation) {
-  const cityName = location.city || location.name || location.state || "—";
-  const zip = location.zipCode || location.zip;
-  return zip ? `${cityName} - ${zip}` : cityName;
+  const city = location?.city;
+  const zipCode = location?.zipCode;
+
+  if (city && zipCode) return `${city} - ${zipCode}`;
+  if (city) return city;
+  if (zipCode) return zipCode;
+  return location?.state || "-";
 }
 
 export default function AreaDataTable({ search = "" }: { search?: string }) {
@@ -70,12 +74,12 @@ export default function AreaDataTable({ search = "" }: { search?: string }) {
               </TableRow>
             ) : locations.length ? (
               locations.map((location, index) => (
-                <TableRow key={location.city || location.state || index} className="">
+                <TableRow key={index} className="">
                   <TableCell className="font-medium">{formatRank(index)}</TableCell>
                   <TableCell className="capitalize">{formatLocationName(location)}</TableCell>
-                  <TableCell>{location.totalJobs}</TableCell>
+                  <TableCell>{location?.totalJobs ?? 0}</TableCell>
                   <TableCell className="font-semibold">
-                    {formatRevenue(location.revenue)}
+                    {formatRevenue(location?.revenue ?? 0)}
                   </TableCell>
                 </TableRow>
               ))

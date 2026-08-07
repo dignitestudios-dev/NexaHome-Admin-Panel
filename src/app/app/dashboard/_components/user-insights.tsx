@@ -96,9 +96,7 @@ const UserInsights: React.FC = () => {
     if (item.count != null && item.total != null) {
       return `(${item.count} of ${item.total})`;
     }
-    const total = 90;
-    const count = Math.round((item.value * total) / 100);
-    return `(${count} of ${total})`;
+    return null;
   };
 
   return (
