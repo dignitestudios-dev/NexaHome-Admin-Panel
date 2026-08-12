@@ -62,7 +62,8 @@ export function PartnersTable({ search = "" }: { search?: string }) {
             <TableRow className="font-light">
               <TableHead className="rounded-l-3xl">Partner Name</TableHead>
               <TableHead>Referral Code</TableHead>
-              <TableHead>Users Referred</TableHead>
+              <TableHead className="text-center">Users Referred Count</TableHead>
+              <TableHead className="text-center">Link Referrals Count</TableHead>
               <TableHead>Jobs Posted</TableHead>
               <TableHead>Partner Commission</TableHead>
               <TableHead>Status</TableHead>
@@ -73,7 +74,7 @@ export function PartnersTable({ search = "" }: { search?: string }) {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   <div className="flex items-center justify-center">
                     <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
                     <span className="ml-2">Loading...</span>
@@ -82,7 +83,7 @@ export function PartnersTable({ search = "" }: { search?: string }) {
               </TableRow>
             ) : isError ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-red-600">
+                <TableCell colSpan={8} className="h-24 text-center text-red-600">
                   {(error as Error)?.message ?? "Failed to load partners."}
                 </TableCell>
               </TableRow>
@@ -108,7 +109,12 @@ export function PartnersTable({ search = "" }: { search?: string }) {
                       </div>
                     </TableCell>
                     <TableCell>{getPartnerReferralCode(partner)}</TableCell>
-                    <TableCell>{partner.usersReferredCount}</TableCell>
+                    <TableCell className="text-center">
+                      {partner.usersReferredCount}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {partner.linkReferralsCount ?? 0}
+                    </TableCell>
                     <TableCell>{partner.jobsPosted}</TableCell>
                     <TableCell>
                       {formatPartnerRevenue(partner.revenueGenerated)}
@@ -139,7 +145,7 @@ export function PartnersTable({ search = "" }: { search?: string }) {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   No partners found.
                 </TableCell>
               </TableRow>

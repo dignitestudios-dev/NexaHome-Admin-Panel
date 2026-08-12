@@ -55,8 +55,10 @@ export const insightsApi = {
   }: InsightsListParams = {}): Promise<TopLocation[]> => {
     try {
       const params: Record<string, string | number> = { limit };
-      if (search?.trim()) params.search = search.trim();
-      appendLocationParams(params, city, zipCode);
+      // API expects `search` (not `city`) for location filtering
+      const searchValue = search?.trim() || city?.trim();
+      if (searchValue) params.search = searchValue;
+      if (zipCode?.trim()) params.zipCode = zipCode.trim();
 
       const { data } = await API.get("/admin/insights/top-locations", { params });
       const payload = data?.data ?? data;

@@ -192,12 +192,17 @@ export default function InsightsPage() {
   } = useTopLocations(10, undefined, debouncedCity, debouncedZipCode);
 
   const tableData = topLocations.map((location) => {
-    const cityName = location.city || location.name || location.state || "—";
-    const zip = location.zipCode || location.zip;
+    const city = location?.city;
+    const zipCode = location?.zipCode;
+    const area =
+      city && zipCode
+        ? `${city} - ${zipCode}`
+        : city || zipCode || location?.state || "-";
+
     return {
-      area: zip ? `${cityName} - ${zip}` : cityName,
-      totalJobs: location.totalJobs,
-      demand: location.revenue,
+      area,
+      totalJobs: location?.totalJobs ?? 0,
+      demand: location?.revenue ?? 0,
     };
   });
   const totalLocationPages = Math.max(
