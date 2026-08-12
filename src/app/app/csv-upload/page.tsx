@@ -74,6 +74,8 @@ export default function CSVUpload() {
       <AddCategoryModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
+        onDownloadTemplate={handleDownloadTemplate}
+        isDownloadingTemplate={downloadTemplate.isPending}
         onSuccess={() => {
           setIsSuccess(true);
           setPage(1);
