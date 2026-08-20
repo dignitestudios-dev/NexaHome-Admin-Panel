@@ -16,6 +16,7 @@ import {
   TableProperties,
   ArrowUpToLine,
   Eye,
+  AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -81,6 +82,7 @@ const menu = [
   },
 
   { label: "CSV Upload", icon: ArrowUpToLine, link: "/app/csv-upload" },
+  { label: "Reported Issues", icon: AlertCircle, link: "/app/report-issues" },
 ];
 
 export default function Sidebar() {
