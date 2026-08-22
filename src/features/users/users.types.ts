@@ -136,6 +136,7 @@ export interface ProviderDetailResponse {
     badgeSubscription?: any;
     serviceSubscription?: any;
     stats?: ProviderDetailStats;
+    selectedCategories?: any[];
     createdAt: string;
     updatedAt: string;
     [key: string]: any;
