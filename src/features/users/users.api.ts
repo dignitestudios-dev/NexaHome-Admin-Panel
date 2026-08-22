@@ -1,8 +1,12 @@
 import { API } from "@/lib/axios";
 import { getApiErrorMessage } from "@/lib/api/error";
 import type {
+  AnyUserDetail,
   GetUsersParams,
+  PartnerDetailResponse,
+  ProviderDetailResponse,
   User,
+  UserDetailResponse,
   UsersListResponse,
   UsersListResult,
 } from "./users.types";
@@ -53,6 +57,23 @@ export const usersApi = {
       const { data } = await API.patch(`/admin/users/${id}/deactivate`);
       const payload = data?.data ?? data;
       return (payload?.user ?? payload) as User;
+    } catch (error) {
+      throw new Error(getApiErrorMessage(error));
+    }
+  },
+
+  getUserDetail: async (id: string, role: string): Promise<AnyUserDetail> => {
+    try {
+      if (role === "partner") {
+        const { data } = await API.get<PartnerDetailResponse>(`/admin/partners/${id}`);
+        return data.data;
+      } else if (role === "service-provider" || role === "expert") {
+        const { data } = await API.get<ProviderDetailResponse>(`/admin/experts/${id}`);
+        return data.data;
+      } else {
+        const { data } = await API.get<UserDetailResponse>(`/admin/users/${id}`);
+        return data.data;
+      }
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
     }

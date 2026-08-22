@@ -107,3 +107,11 @@ export function useToggleUserDeactivate() {
     },
   });
 }
+
+export function useUserDetail(userId: string, role: string, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ["user", userId, role],
+    queryFn: () => usersApi.getUserDetail(userId, role),
+    enabled: options?.enabled ?? (!!userId && !!role),
+  });
+}

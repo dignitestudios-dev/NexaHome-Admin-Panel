@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogOverlay,
   DialogPortal,
+  DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,9 +20,10 @@ import {
   Shield,
   UserX,
   X,
+  Phone,
 } from "lucide-react";
 import ConfirmActionModal from "@/app/app/_components/confirmation-modal";
-import { useToggleUserDeactivate } from "@/features/users/users.hooks";
+import { useToggleUserDeactivate, useUserDetail } from "@/features/users/users.hooks";
 import type {
   User,
   UserProfilePicture,
@@ -187,6 +189,12 @@ export function UserDetailsModal({
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const { mutate: toggleDeactivate, isPending } = useToggleUserDeactivate();
 
+  const { data: userDetail, isLoading: isDetailLoading } = useUserDetail(
+    user?._id ?? "",
+    user?.role ?? "",
+    { enabled: !!user && open }
+  );
+
   if (!user) return null;
 
   const isActive = !user.isDeactivatedByAdmin;
@@ -232,12 +240,13 @@ export function UserDetailsModal({
           if (!isOpen) onClose();
         }}
       >
-        <DialogPortal>
-          <DialogOverlay />
-
-          <div className="fixed left-1/2 top-1/2 z-50 flex w-[min(920px,calc(100vw-2rem))] max-h-[92vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+        <DialogContent
+          showCloseButton={false}
+          className="flex w-[min(920px,calc(100vw-2rem))] max-h-[92vh] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl p-0 sm:max-w-none gap-0"
+        >
+          <div className="flex h-full flex-col overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5 shrink-0">
               <DialogHeader className="space-y-0">
                 <DialogTitle className="text-[22px] font-semibold text-slate-900">
                   {getModalTitle(user.role)}
@@ -342,15 +351,134 @@ export function UserDetailsModal({
                     label="Role"
                     value={formatRoleLabel(user.role)}
                   />
+                  {userDetail?.phone && (
+                    <InfoCell
+                      icon={Phone}
+                      label="Phone"
+                      value={userDetail.phone}
+                    />
+                  )}
                 </div>
               </div>
 
-            
-            </div>
+              {isDetailLoading && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+                </div>
+              )}
 
-           
+              {userDetail?.stats && (
+                <div className="mb-5 overflow-hidden rounded-xl border border-slate-200">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-800">Statistics</h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2">
+                    {Object.entries(userDetail.stats).map(([key, val]) => (
+                      <InfoCell
+                        key={key}
+                        icon={FileText}
+                        label={formatDisplayName(key.replace(/([A-Z])/g, ' $1').trim())}
+                        value={String(val)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {userDetail && (
+                <div className="mb-5 overflow-hidden rounded-xl border border-slate-200">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-800">Additional Info</h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2">
+                    {userDetail.isEmailVerified !== undefined && <InfoCell icon={CheckCircle2} label="Email Verified" value={userDetail.isEmailVerified ? "Yes" : "No"} />}
+                    {userDetail.isPhoneVerified !== undefined && <InfoCell icon={CheckCircle2} label="Phone Verified" value={userDetail.isPhoneVerified ? "Yes" : "No"} />}
+                    {userDetail.isProfileCompleted !== undefined && <InfoCell icon={CheckCircle2} label="Profile Completed" value={userDetail.isProfileCompleted ? "Yes" : "No"} />}
+
+                    {userDetail.companyName && <InfoCell icon={FileText} label="Company Name" value={userDetail.companyName} />}
+                    {userDetail.contactEmail && <InfoCell icon={Mail} label="Contact Email" value={userDetail.contactEmail} />}
+                    {userDetail.identityStatus && <InfoCell icon={Shield} label="Identity Status" value={userDetail.identityStatus} />}
+                    {userDetail.averageRating !== undefined && <InfoCell icon={FileText} label="Average Rating" value={String(userDetail.averageRating)} />}
+                    {userDetail.totalReviews !== undefined && <InfoCell icon={FileText} label="Total Reviews" value={String(userDetail.totalReviews)} />}
+
+                    {userDetail.stripeAccountStatus && <InfoCell icon={FileText} label="Stripe Status" value={userDetail.stripeAccountStatus} />}
+                    {userDetail.isPartnerApproved !== undefined && <InfoCell icon={CheckCircle2} label="Partner Approved" value={userDetail.isPartnerApproved ? "Yes" : "No"} />}
+                  </div>
+                </div>
+              )}
+
+              {userDetail?.documents && Object.keys(userDetail.documents).length > 0 && (
+                (() => {
+                  const validDocs = Object.entries(userDetail.documents).filter(([key, doc]: any) => doc && key !== "idCard");
+                  return (
+                    <div className="mb-5 overflow-hidden rounded-xl border border-slate-200">
+                      <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
+                        <h3 className="text-sm font-semibold text-slate-800">Documents</h3>
+                      </div>
+                      {validDocs.length === 0 ? (
+                        <div className="p-6 text-center text-[14px] text-slate-500 bg-slate-50/50">
+                          Docs not provided
+                        </div>
+                      ) : (
+                        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {validDocs.map(([key, doc]: any) => {
+                            if (doc.front || doc.back) {
+                              return (
+                                <div key={key} className="flex flex-col gap-2 border border-slate-200 rounded p-3 bg-white">
+                                  <p className="text-sm font-medium text-slate-800">{formatDisplayName(key.replace(/([A-Z])/g, ' $1').trim())}</p>
+                                  {doc.front && <a href={doc.front.location} target="_blank" rel="noreferrer" className="text-[13px] text-[#005864] hover:underline">View Front</a>}
+                                  {doc.back && <a href={doc.back.location} target="_blank" rel="noreferrer" className="text-[13px] text-[#005864] hover:underline">View Back</a>}
+                                </div>
+                              );
+                            }
+                            return (
+                              <div key={key} className="flex flex-col gap-2 border border-slate-200 rounded p-3 bg-white">
+                                <p className="text-sm font-medium text-slate-800">{formatDisplayName(key.replace(/([A-Z])/g, ' $1').trim())}</p>
+                                <a href={doc.location} target="_blank" rel="noreferrer" className="text-[13px] text-[#005864] hover:underline">View Document</a>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()
+              )}
+
+              {userDetail?.portfolioMedia?.length > 0 && (
+                <div className="mb-5 overflow-hidden rounded-xl border border-slate-200">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-800">Portfolio</h3>
+                  </div>
+                  <div className="p-4 flex flex-wrap gap-4">
+                    {userDetail?.portfolioMedia.map((media: any) => (
+                      <a key={media._id} href={media.location} target="_blank" rel="noreferrer" className="block w-24 h-24 overflow-hidden rounded-lg border border-slate-200 hover:opacity-80 transition-opacity">
+                        <img src={media.location} alt={media.fileName} className="w-full h-full object-cover" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {userDetail?.addresses?.length > 0 && (
+                <div className="mb-5 overflow-hidden rounded-xl border border-slate-200">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
+                    <h3 className="text-sm font-semibold text-slate-800">Addresses</h3>
+                  </div>
+                  <div className="p-4 flex flex-col gap-3">
+                    {userDetail?.addresses.map((addr: any) => (
+                      <div key={addr._id} className="text-[14px] text-slate-800 flex items-center justify-between border-b border-slate-100 pb-2 last:border-0 last:pb-0">
+                        <span>{addr.street}, {addr.city}, {addr.state} {addr.zipCode}</span>
+                        {addr.isDefault && <span className="text-[11px] uppercase tracking-wider text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Default</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
           </div>
-        </DialogPortal>
+        </DialogContent>
       </Dialog>
 
       <ConfirmActionModal
