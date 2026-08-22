@@ -7,11 +7,18 @@ import { UserStatusFilter } from "./_components/user-status-filter";
 import type { UserStatusFilter as StatusFilter } from "@/features/users/users.types";
 import type { UserTypeFilter as TypeFilter } from "@/features/users/users.types";
 
+const USER_TYPE_TABS: { label: string; value: TypeFilter }[] = [
+  // { label: "All Users", value: "all" },
+  { label: "Normal Users", value: "user" },
+  { label: "Service Providers", value: "service-provider" },
+  { label: "Partners", value: "partner" },
+];
+
 export default function UserManagementPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
-  const [userType, setUserType] = useState<TypeFilter>("all");
+  const [userType, setUserType] = useState<TypeFilter>("user");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,13 +42,27 @@ export default function UserManagementPage() {
           />
           <UserStatusFilter
             status={status}
-            userType={userType}
-            onApply={({ status: nextStatus, userType: nextType }) => {
+            onApply={({ status: nextStatus }) => {
               setStatus(nextStatus);
-              setUserType(nextType);
             }}
           />
         </div>
+      </div>
+
+      <div className="flex gap-4 border-b border-gray-200 mb-6">
+        {USER_TYPE_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setUserType(tab.value)}
+            className={`pb-3 px-1 text-sm font-medium transition-colors border-b-2 ${
+              userType === tab.value
+                ? "border-[#005864] text-[#005864]"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <div className="relative z-10">

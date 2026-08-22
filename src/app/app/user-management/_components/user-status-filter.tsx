@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/drawer";
 import { CgClose } from "react-icons/cg";
 import { FaFilter } from "react-icons/fa";
-import type { UserStatusFilter, UserTypeFilter } from "@/features/users/users.types";
+import type { UserStatusFilter } from "@/features/users/users.types";
 
 const STATUS_OPTIONS: { label: string; value: UserStatusFilter }[] = [
   { label: "All", value: "all" },
@@ -21,40 +21,27 @@ const STATUS_OPTIONS: { label: string; value: UserStatusFilter }[] = [
   { label: "Inactive", value: "inactive" },
 ];
 
-const USER_TYPE_OPTIONS: { label: string; value: UserTypeFilter }[] = [
-  { label: "All", value: "all" },
-  { label: "User", value: "user" },
-  { label: "Service Provider", value: "service-provider" },
-  { label: "Partner", value: "partner" },
-];
-
 type UserStatusFilterProps = {
   status?: UserStatusFilter;
-  userType?: UserTypeFilter;
-  onApply: (filters: { status: UserStatusFilter; userType: UserTypeFilter }) => void;
+  onApply: (filters: { status: UserStatusFilter }) => void;
 };
 
 export function UserStatusFilter({
   status = "all",
-  userType = "all",
   onApply,
 }: UserStatusFilterProps) {
   const [selectedStatus, setSelectedStatus] = useState<UserStatusFilter>(status);
-  const [selectedUserType, setSelectedUserType] =
-    useState<UserTypeFilter>(userType);
 
   useEffect(() => {
     setSelectedStatus(status);
-    setSelectedUserType(userType);
-  }, [status, userType]);
+  }, [status]);
 
   const handleClearAll = () => {
     setSelectedStatus("all");
-    setSelectedUserType("all");
   };
 
   const handleApply = () => {
-    onApply({ status: selectedStatus, userType: selectedUserType });
+    onApply({ status: selectedStatus });
   };
 
   return (
@@ -97,28 +84,6 @@ export function UserStatusFilter({
                   name="user-status"
                   checked={selectedStatus === option.value}
                   onChange={() => setSelectedStatus(option.value)}
-                  className="h-4 w-4 accent-[#005864]"
-                />
-                <span className="text-[16px]">{option.label}</span>
-              </label>
-            ))}
-          </div>
-
-          <div className="mt-6 mb-4 flex justify-between">
-            <span className="text-[20px] font-semibold">User Type</span>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {USER_TYPE_OPTIONS.map((option) => (
-              <label
-                key={option.value}
-                className="flex cursor-pointer items-center gap-3"
-              >
-                <input
-                  type="radio"
-                  name="user-type"
-                  checked={selectedUserType === option.value}
-                  onChange={() => setSelectedUserType(option.value)}
                   className="h-4 w-4 accent-[#005864]"
                 />
                 <span className="text-[16px]">{option.label}</span>
