@@ -9,7 +9,7 @@ import type { UserTypeFilter as TypeFilter } from "@/features/users/users.types"
 
 const USER_TYPE_TABS: { label: string; value: TypeFilter }[] = [
   // { label: "All Users", value: "all" },
-  { label: "Normal Users", value: "user" },
+  { label: "Home owner", value: "user" },
   { label: "Service Providers", value: "service-provider" },
   { label: "Partners", value: "partner" },
 ];

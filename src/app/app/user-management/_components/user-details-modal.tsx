@@ -403,6 +403,7 @@ export function UserDetailsModal({
 
                     {userDetail.stripeAccountStatus && <InfoCell icon={FileText} label="Stripe Status" value={userDetail.stripeAccountStatus} />}
                     {userDetail.isPartnerApproved !== undefined && <InfoCell icon={CheckCircle2} label="Partner Approved" value={userDetail.isPartnerApproved ? "Yes" : "No"} />}
+                    {userDetail.selectedCategories && userDetail.selectedCategories.length > 0 && <InfoCell icon={FileText} label="Categories" value={userDetail.selectedCategories.map((c: any) => c.name).join(", ")} />}
                   </div>
                 </div>
               )}
