@@ -17,6 +17,7 @@ import {
   ArrowUpToLine,
   Eye,
   AlertCircle,
+  UserCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -58,6 +59,11 @@ const menu = [
     link: "/app/verified-experts",
   },
   { label: "User Management", icon: Users, link: "/app/user-management" },
+  {
+    label: "Provider Verifications",
+    icon: UserCheck,
+    link: "/app/provider-verifications",
+  },
   { label: "Reporting", icon: FileText, link: "/app/reporting" },
   { label: "Categories", icon: Folder, link: "/app/categories" },
   {
