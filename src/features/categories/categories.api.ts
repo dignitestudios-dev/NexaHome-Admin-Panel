@@ -197,6 +197,14 @@ export const categoriesApi = {
       throw new Error(getApiErrorMessage(error));
     }
   },
+
+  deleteCategory: async (id: string): Promise<void> => {
+    try {
+      await API.delete(`/admin/categories/${id}`);
+    } catch (error) {
+      throw new Error(getApiErrorMessage(error));
+    }
+  },
 };
 
 export function formatCategoryPricing(pricing?: {

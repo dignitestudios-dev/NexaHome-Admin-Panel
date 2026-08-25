@@ -10,10 +10,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Eye, Pencil } from "lucide-react";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import Pagination from "@/components/global/pagination";
 import { formatCategoryPricing } from "@/features/categories/categories.api";
-import { useCategories } from "@/features/categories/categories.hooks";
+import { useCategories, useDeleteCategory } from "@/features/categories/categories.hooks";
 import type {
   Category,
   CategoryStatusFilter,
@@ -21,6 +21,7 @@ import type {
 import { formatDate } from "@/lib/date";
 import { CategoryDetailsModal } from "./category-details-modal";
 import { EditCategoryModal } from "./edit-category-modal";
+import { DeleteCategoryModal } from "./delete-category-modal";
 
 type CategoriesTableProps = {
   page: number;
@@ -54,6 +55,7 @@ export const CategoriesTable = ({
     null
   );
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
 
   const { data, isLoading, isError, error } = useCategories({
     page,
@@ -61,6 +63,8 @@ export const CategoriesTable = ({
     search: search || undefined,
     status,
   });
+
+  const deleteCategory = useDeleteCategory();
 
   const categories = data?.categories ?? [];
   const totalPages = data?.totalPages ?? 1;
@@ -71,6 +75,12 @@ export const CategoriesTable = ({
 
   const handleNext = () => {
     if (page < totalPages) onPageChange(page + 1);
+  };
+
+  const handleDeleteConfirm = (categoryId: string) => {
+    deleteCategory.mutate(categoryId, {
+      onSuccess: () => setDeletingCategory(null),
+    });
   };
 
   return (
@@ -151,6 +161,14 @@ export const CategoriesTable = ({
                         >
                           <Pencil size={17} />
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeletingCategory(category)}
+                          className={`${actionButtonClass} bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50`}
+                          aria-label={`Delete ${category.name}`}
+                        >
+                          <Trash2 size={17} />
+                        </button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -189,6 +207,14 @@ export const CategoriesTable = ({
         onOpenChange={(open) => {
           if (!open) setEditingCategory(null);
         }}
+      />
+
+      <DeleteCategoryModal
+        open={!!deletingCategory}
+        category={deletingCategory}
+        isDeleting={deleteCategory.isPending}
+        onClose={() => setDeletingCategory(null)}
+        onConfirm={handleDeleteConfirm}
       />
     </>
   );
