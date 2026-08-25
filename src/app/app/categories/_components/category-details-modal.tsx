@@ -8,6 +8,7 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Dialog as DialogPrimitive } from "radix-ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Calendar, DollarSign, FileText, ImageIcon, X } from "lucide-react";
@@ -92,7 +93,7 @@ export function CategoryDetailsModal({
       <DialogPortal>
         <DialogOverlay />
 
-        <div className="fixed left-1/2 top-1/2 z-50 flex w-[min(760px,calc(100vw-2rem))] max-h-[92vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 flex w-[min(760px,calc(100vw-2rem))] max-h-[92vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
             <DialogHeader className="space-y-0">
               <DialogTitle className="text-[22px] font-semibold text-slate-900">
@@ -194,7 +195,7 @@ export function CategoryDetailsModal({
               Close
             </Button>
           </div>
-        </div>
+        </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
   );

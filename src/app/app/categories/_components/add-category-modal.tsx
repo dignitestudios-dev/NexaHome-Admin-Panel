@@ -8,6 +8,7 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Dialog as DialogPrimitive } from "radix-ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -206,7 +207,7 @@ export const AddCategoryModal = ({
       <DialogPortal>
         <DialogOverlay />
 
-        <div className="fixed left-1/2 top-1/2 z-50 flex w-[min(560px,calc(100vw-2rem))] max-h-[92vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 flex w-[min(560px,calc(100vw-2rem))] max-h-[92vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
           <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
             <DialogHeader className="space-y-1 text-left">
               <DialogTitle className="text-[22px] font-semibold text-slate-900">
@@ -406,7 +407,7 @@ export const AddCategoryModal = ({
               )}
             </Button>
           </div>
-        </div>
+        </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
   );
