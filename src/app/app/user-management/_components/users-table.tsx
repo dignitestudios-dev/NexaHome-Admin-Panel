@@ -93,229 +93,125 @@ export const UsersTable = ({
   );
 
   const users = data?.users ?? [];
-
   const totalPages = data?.totalPages ?? 1;
-
-
+  const isProviderTab = userType === "service-provider";
 
   const handlePrev = () => {
-
     if (page > 1) setPage((prev) => prev - 1);
-
   };
-
-
 
   const handleNext = () => {
-
     if (page < totalPages) setPage((prev) => prev + 1);
-
   };
 
-
-
   return (
-
     <>
-
       <div className="rounded-3xl overflow-hidden">
-
         <Table>
-
           <TableHeader>
-
             <TableRow className="font-light">
-
               <TableHead className="rounded-l-3xl">Name</TableHead>
-
+              {isProviderTab && <TableHead>Company Name</TableHead>}
               <TableHead>Email</TableHead>
-
               <TableHead>Join Date</TableHead>
-
               <TableHead>User Type</TableHead>
-
               <TableHead>Status</TableHead>
-
               <TableHead className="rounded-r-3xl text-center">Action</TableHead>
-
             </TableRow>
-
           </TableHeader>
 
-
-
           <TableBody>
-
             {isError ? (
-
               <TableRow>
-
-                <TableCell colSpan={6} className="h-24 text-center text-red-600">
-
+                <TableCell colSpan={isProviderTab ? 7 : 6} className="h-24 text-center text-red-600">
                   ⚠ {(error as Error)?.message ?? "Failed to load users."}
-
                 </TableCell>
-
               </TableRow>
-
             ) : isLoading ? (
-
               <TableRow>
-
-                <TableCell colSpan={6} className="h-24 text-center">
-
+                <TableCell colSpan={isProviderTab ? 7 : 6} className="h-24 text-center">
                   <div className="flex items-center justify-center">
-
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-
                     <span className="ml-2">Loading...</span>
-
                   </div>
-
                 </TableCell>
-
               </TableRow>
-
             ) : users.length ? (
-
               users.map((user) => {
-
                 const status = user.isDeactivatedByAdmin ? "Inactive" : "Active";
 
-
-
                 return (
-
                   <TableRow
-
                     key={user._id}
-
                     className="font-normal hover:bg-gray-50 transition-colors"
-
                   >
-
                     <TableCell>
-
                       <div className="flex items-center gap-2">
-
                         <Avatar className="h-10 w-10">
-
                           <AvatarImage
-
                             src={
-
                               typeof user.profilePicture === "string"
-
                                 ? user.profilePicture
-
                                 : user.profilePicture?.location ?? undefined
-
                             }
-
                             alt={user.name}
-
                           />
-
                           <AvatarFallback className="bg-[#212121] text-white font-medium text-[12px]">
-
                             {getInitials(user.name)}
-
                           </AvatarFallback>
-
                         </Avatar>
-
                         <span>{user.name}</span>
-
                       </div>
-
                     </TableCell>
 
-
+                    {isProviderTab && (
+                      <TableCell className="font-medium text-slate-700">
+                        {user.companyName || "—"}
+                      </TableCell>
+                    )}
 
                     <TableCell>{user.email}</TableCell>
 
-
-
                     <TableCell>
-
                       {formatDate(user.joinDate)}
-
                     </TableCell>
-
-
 
                     <TableCell>{formatRole(user.role)}</TableCell>
 
-
-
                     <TableCell>
-
                       <span
-
                         className={`font-medium ${
-
                           status === "Active"
-
                             ? "text-[#16BC4E]"
-
                             : "text-[#FF0000]"
-
                         }`}
-
                       >
-
                         {status}
-
                       </span>
-
                     </TableCell>
-
-
 
                     <TableCell className="text-center">
-
                       <button
-
                         type="button"
-
                         onClick={() => setSelectedUser(user)}
-
                         className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-[#F0F5F6] text-[#005864] hover:bg-[#e2eced] transition"
-
                         aria-label={`View ${user.name}`}
-
                       >
-
                         <Eye size={18} />
-
                       </button>
-
                     </TableCell>
-
                   </TableRow>
-
                 );
-
               })
-
             ) : (
-
               <TableRow>
-
-                <TableCell colSpan={6} className="h-24 text-center">
-
+                <TableCell colSpan={isProviderTab ? 7 : 6} className="h-24 text-center">
                   No users found.
-
                 </TableCell>
-
               </TableRow>
-
             )}
-
           </TableBody>
-
         </Table>
-
       </div>
 
 
