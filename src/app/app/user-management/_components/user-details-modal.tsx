@@ -8,6 +8,7 @@ import {
   DialogPortal,
   DialogContent,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import type {
 } from "@/features/users/users.types";
 import { formatDate } from "@/lib/date";
 import { cn } from "@/lib/utils";
+import { PortfolioMediaGallery } from "./portfolio-media-gallery";
 
 type UserDetailsModalProps = {
   open: boolean;
@@ -251,6 +253,9 @@ export function UserDetailsModal({
                 <DialogTitle className="text-[22px] font-semibold text-slate-900">
                   {getModalTitle(user.role)}
                 </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Detailed view of user profile and account details
+                </DialogDescription>
               </DialogHeader>
               <button
                 type="button"
@@ -395,7 +400,7 @@ export function UserDetailsModal({
                     {userDetail.isPhoneVerified !== undefined && <InfoCell icon={CheckCircle2} label="Phone Verified" value={userDetail.isPhoneVerified ? "Yes" : "No"} />}
                     {userDetail.isProfileCompleted !== undefined && <InfoCell icon={CheckCircle2} label="Profile Completed" value={userDetail.isProfileCompleted ? "Yes" : "No"} />}
 
-                    {userDetail.companyName && <InfoCell icon={FileText} label="Company Name" value={userDetail.companyName} />}
+                    {(userDetail.companyName || user.companyName) && <InfoCell icon={FileText} label="Company Name" value={userDetail.companyName || user.companyName || "—"} />}
                     {userDetail.contactEmail && <InfoCell icon={Mail} label="Contact Email" value={userDetail.contactEmail} />}
                     {userDetail.identityStatus && <InfoCell icon={Shield} label="Identity Status" value={userDetail.identityStatus} />}
                     {userDetail.averageRating !== undefined && <InfoCell icon={FileText} label="Average Rating" value={String(userDetail.averageRating)} />}
@@ -410,7 +415,9 @@ export function UserDetailsModal({
 
               {userDetail?.documents && Object.keys(userDetail.documents).length > 0 && (
                 (() => {
-                  const validDocs = Object.entries(userDetail.documents).filter(([key, doc]: any) => doc && key !== "idCard");
+                  const validDocs = Object.entries(userDetail.documents).filter(
+                    ([_, doc]: any) => doc && (doc.location || doc.front || doc.back)
+                  );
                   return (
                     <div className="mb-5 overflow-hidden rounded-xl border border-slate-200">
                       <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
@@ -446,17 +453,16 @@ export function UserDetailsModal({
                 })()
               )}
 
-              {userDetail?.portfolioMedia?.length > 0 && (
+              {userDetail?.portfolioMedia && userDetail.portfolioMedia.length > 0 && (
                 <div className="mb-5 overflow-hidden rounded-xl border border-slate-200">
-                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-slate-800">Portfolio</h3>
+                    <span className="text-xs text-slate-500 font-medium">
+                      {userDetail.portfolioMedia.length} {userDetail.portfolioMedia.length === 1 ? "item" : "items"}
+                    </span>
                   </div>
-                  <div className="p-4 flex flex-wrap gap-4">
-                    {userDetail?.portfolioMedia.map((media: any) => (
-                      <a key={media._id} href={media.location} target="_blank" rel="noreferrer" className="block w-24 h-24 overflow-hidden rounded-lg border border-slate-200 hover:opacity-80 transition-opacity">
-                        <img src={media.location} alt={media.fileName} className="w-full h-full object-cover" />
-                      </a>
-                    ))}
+                  <div className="p-4">
+                    <PortfolioMediaGallery mediaList={userDetail.portfolioMedia} />
                   </div>
                 </div>
               )}

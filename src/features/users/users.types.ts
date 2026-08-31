@@ -21,6 +21,7 @@ export interface User {
   email: string;
   role: string;
   name: string;
+  companyName?: string | null;
   profilePicture: UserProfilePicture | string | null;
   isDeactivatedByAdmin: boolean;
   selectedCategories: UserSelectedCategory[];
@@ -115,6 +116,26 @@ export interface UserDetailResponse {
   }
 }
 
+export interface PortfolioMedia {
+  _id?: string;
+  fileName?: string;
+  name?: string;
+  originalName?: string;
+  key?: string;
+  mimetype?: string;
+  mimeType?: string;
+  contentType?: string;
+  location?: string;
+  url?: string;
+  fileUrl?: string;
+  thumbnail?: string | { location?: string; url?: string };
+  thumbnailUrl?: string;
+  type?: string;
+  size?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface ProviderDetailResponse {
   message: string;
   data: {
@@ -131,7 +152,7 @@ export interface ProviderDetailResponse {
     averageRating?: number;
     totalReviews?: number;
     documents?: any;
-    portfolioMedia?: any[];
+    portfolioMedia?: PortfolioMedia[];
     addresses?: any[];
     badgeSubscription?: any;
     serviceSubscription?: any;

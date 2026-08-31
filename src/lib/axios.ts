@@ -2,7 +2,7 @@ import axios from "axios";
 import { clearAuthTokenCookie, getAuthTokenCookie } from "@/lib/auth-session";
 
 // export const baseURL = "https://0hw8tf6g-3050.inc1.devtunnels.ms";
-export const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://api.staging.nexahomeapp.com";
+export const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://api.nexahomeapp.com";
 // export const baseURL = "https://api.nexahomeapp.com";
 
 const headers = {
