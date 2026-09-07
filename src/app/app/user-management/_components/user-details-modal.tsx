@@ -397,7 +397,7 @@ export function UserDetailsModal({
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2">
                     {userDetail.isEmailVerified !== undefined && <InfoCell icon={CheckCircle2} label="Email Verified" value={userDetail.isEmailVerified ? "Yes" : "No"} />}
-                    {userDetail.isPhoneVerified !== undefined && <InfoCell icon={CheckCircle2} label="Phone Verified" value={userDetail.isPhoneVerified ? "Yes" : "No"} />}
+                    {/* {userDetail.isPhoneVerified !== undefined && <InfoCell icon={CheckCircle2} label="Phone Verified" value={userDetail.isPhoneVerified ? "Yes" : "No"} />} */}
                     {userDetail.isProfileCompleted !== undefined && <InfoCell icon={CheckCircle2} label="Profile Completed" value={userDetail.isProfileCompleted ? "Yes" : "No"} />}
 
                     {(userDetail.companyName || user.companyName) && <InfoCell icon={FileText} label="Company Name" value={userDetail.companyName || user.companyName || "—"} />}
