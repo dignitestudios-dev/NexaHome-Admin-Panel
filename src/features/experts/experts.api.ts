@@ -11,10 +11,16 @@ export const expertsApi = {
   getExperts: async ({
     page = 1,
     limit = 10,
+    isBadgeActive,
   }: GetExpertsParams = {}): Promise<ExpertsListResult> => {
     try {
+      const params: Record<string, string | number | boolean> = { page, limit };
+      if (typeof isBadgeActive === "boolean") {
+        params.isBadgeActive = isBadgeActive;
+      }
+
       const { data } = await API.get("/admin/experts", {
-        params: { page, limit },
+        params,
       });
       const payload = (data?.data ?? data) as ExpertsListResponse;
       const experts = payload?.experts ?? [];

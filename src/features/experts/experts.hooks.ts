@@ -3,15 +3,19 @@ import { expertsApi } from "./experts.api";
 
 export const expertKeys = {
   all: ["experts"] as const,
-  list: (page: number, limit: number) =>
-    ["experts", "list", page, limit] as const,
+  list: (page: number, limit: number, isBadgeActive?: boolean) =>
+    ["experts", "list", page, limit, isBadgeActive] as const,
   detail: (id: string) => ["experts", "detail", id] as const,
 };
 
-export function useExperts(page = 1, limit = 10) {
+export function useExperts(
+  page = 1,
+  limit = 10,
+  isBadgeActive?: boolean
+) {
   return useQuery({
-    queryKey: expertKeys.list(page, limit),
-    queryFn: () => expertsApi.getExperts({ page, limit }),
+    queryKey: expertKeys.list(page, limit, isBadgeActive),
+    queryFn: () => expertsApi.getExperts({ page, limit, isBadgeActive }),
   });
 }
 
