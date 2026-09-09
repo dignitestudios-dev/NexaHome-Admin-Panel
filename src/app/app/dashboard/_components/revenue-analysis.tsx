@@ -46,7 +46,7 @@ const RevenueAnalysis = () => {
           value={groupBy}
           onValueChange={(value) => setGroupBy(value as RevenueGroupBy)}
         >
-          <SelectTrigger className="w-[120px] h-8 text-xs font-bold bg-[#F4F9F9] border-none">
+          <SelectTrigger className="w-[120px] h-8 text-xs font-bold bg-transparent border-none">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -88,11 +88,7 @@ const RevenueAnalysis = () => {
               />
 
               <Tooltip
-                cursor={{
-                  fill: "rgba(15,163,163,0.1)",
-                  stroke: "transparent",
-                  strokeWidth: 0,
-                }}
+                cursor={false}
                 contentStyle={{
                   borderRadius: "12px",
                   border: "none",

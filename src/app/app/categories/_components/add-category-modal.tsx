@@ -21,6 +21,7 @@ import {
   MAX_CATEGORY_CREDITS_DIGITS,
   MAX_CATEGORY_NAME_LENGTH,
 } from "@/features/categories/categories.api";
+import { cn } from "@/lib/utils";
 
 interface AddCategoryModalProps {
   open: boolean;
@@ -85,7 +86,9 @@ export const AddCategoryModal = ({
     const { name, value } = e.target;
     setSubmitError("");
     if (name === "name") {
-      setShowNameError(false);
+      if (showNameError && !validateCategoryName(value)) {
+        setShowNameError(false);
+      }
     }
     if (name === "oneTimeCredits" || name === "recurringCredits") {
       setShowCreditsError(false);
@@ -247,9 +250,20 @@ export const AddCategoryModal = ({
                 value={formData.name}
                 maxLength={MAX_CATEGORY_NAME_LENGTH}
                 onChange={handleInputChange}
+                onBlur={() => {
+                  if (formData.name.trim()) {
+                    setShowNameError(true);
+                  }
+                }}
                 placeholder="e.g. Air Duct Cleaning"
                 disabled={createCategory.isPending}
-                className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
+                aria-invalid={!!nameError}
+                className={cn(
+                  "h-11 rounded-xl bg-slate-50 text-[15px] focus-visible:ring-[#005864]",
+                  nameError
+                    ? "border-red-300 focus-visible:ring-red-500"
+                    : "border-slate-200"
+                )}
               />
               {nameError ? (
                 <p className="text-sm text-red-600">{nameError}</p>

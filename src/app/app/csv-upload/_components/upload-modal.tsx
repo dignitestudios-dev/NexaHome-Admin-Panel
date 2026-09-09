@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Dialog, DialogPortal, DialogOverlay } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Dialog as DialogPrimitive } from "radix-ui";
 import { Button } from "@/components/ui/button";
 import {
   AlertCircle,
@@ -132,7 +139,7 @@ export const AddCategoryModal = ({
       <DialogPortal>
         <DialogOverlay />
 
-        <div className="fixed left-1/2 top-1/2 z-50 w-[min(620px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-2xl max-h-[92vh] flex flex-col">
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 flex w-[min(620px,calc(100vw-2rem))] max-h-[92vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-2xl outline-none">
           <button
             type="button"
             onClick={handleCancel}
@@ -143,13 +150,15 @@ export const AddCategoryModal = ({
             <X className="h-5 w-5" />
           </button>
 
-          <div className="px-7 py-7 overflow-y-auto space-y-5">
+          <div className="flex-1 min-h-0 overflow-y-auto px-7 py-7 space-y-5">
             {/* Header */}
             <div className="pr-8">
-              <h2 className="text-2xl font-semibold text-[#181818]">CSV Upload &amp; Invitation Setup</h2>
-              <p className="mt-1 text-sm text-[#565656]">
+              <DialogTitle className="text-2xl font-semibold text-[#181818]">
+                CSV Upload &amp; Invitation Setup
+              </DialogTitle>
+              <DialogDescription className="mt-1 text-sm text-[#565656]">
                 Upload your homeowner contact CSV to automatically dispatch invitation emails.
-              </p>
+              </DialogDescription>
             </div>
 
             {/* 1. Post-Upload Process Flow */}
@@ -410,7 +419,7 @@ export const AddCategoryModal = ({
               </Button>
             </div>
           </div>
-        </div>
+        </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
   );

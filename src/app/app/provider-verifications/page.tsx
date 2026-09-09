@@ -23,7 +23,7 @@ export default function ProviderVerificationsPage() {
     <div className="min-h-screen bg-[#EAFCFF] px-0 font-sans">
       <div className="flex justify-between items-center my-4">
         <h1 className="heading text-[#1C1C1C] tracking-tight">
-          Provider Verifications
+        Service Provider Verifications
         </h1>
         <div className="flex items-center gap-2">
           <SearchInput

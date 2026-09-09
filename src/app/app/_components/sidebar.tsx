@@ -60,7 +60,7 @@ const menu = [
   },
   { label: "User Management", icon: Users, link: "/app/user-management" },
   {
-    label: "Provider Verifications",
+    label: "Service Provider Verifications",
     icon: UserCheck,
     link: "/app/provider-verifications",
   },

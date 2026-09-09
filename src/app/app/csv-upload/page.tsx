@@ -47,7 +47,7 @@ export default function CSVUpload() {
         <h1 className="heading">CSV Upload</h1>
         <div className="flex items-center gap-2">
           <SearchInput value={search} onChange={setSearch} placeholder="Search" />
-          <Button
+          {/* <Button
             onClick={handleDownloadTemplate}
             disabled={downloadTemplate.isPending}
             className="px-6"
@@ -60,7 +60,7 @@ export default function CSVUpload() {
             ) : (
               "CSV Template"
             )}
-          </Button>
+          </Button> */}
           <Button onClick={() => setIsModalOpen(true)} className="px-6">
             CSV Upload
           </Button>

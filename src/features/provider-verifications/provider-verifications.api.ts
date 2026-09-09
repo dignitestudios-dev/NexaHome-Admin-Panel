@@ -21,7 +21,7 @@ export const fetchProviderVerifications = async (
     params.search = search;
   }
 
-  const { data } = await API.get<ProviderVerificationsResponse>("/admin/providers/verifications?status=pending", {
+  const { data } = await API.get<ProviderVerificationsResponse>("/admin/providers/verifications", {
     params,
   });
   return data;

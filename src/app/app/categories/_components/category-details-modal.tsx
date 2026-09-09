@@ -142,7 +142,7 @@ export function CategoryDetailsModal({
 
                 <div className="mb-5 overflow-hidden rounded-xl border border-slate-200">
                   <div className="grid grid-cols-1 sm:grid-cols-2">
-                    <InfoCell
+                    {/* <InfoCell
                       icon={DollarSign}
                       label="Dollar Price"
                       value={
@@ -150,7 +150,7 @@ export function CategoryDetailsModal({
                           ? `$${category.pricing?.oneTimeCredits}`
                           : "—"
                       }
-                    />
+                    /> */}
                     <InfoCell
                       icon={DollarSign}
                       label="One Time Credits"
@@ -161,11 +161,11 @@ export function CategoryDetailsModal({
                       label="Recurring Credits"
                       value={category.pricing?.recurringCredits ?? "—"}
                     />
-                    <InfoCell
+                    {/* <InfoCell
                       icon={FileText}
                       label="Credits"
                       value={category.credits ?? "—"}
-                    />
+                    /> */}
                     <InfoCell
                       icon={Calendar}
                       label="Created At"

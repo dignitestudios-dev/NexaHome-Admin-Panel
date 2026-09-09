@@ -53,6 +53,26 @@ export function validateCategoryName(name: string): string | null {
     return `Category name must be ${MAX_CATEGORY_NAME_LENGTH} characters or less.`;
   }
 
+  // Reject input consisting only of special characters or symbols
+  if (!/[\p{L}\p{N}]/u.test(trimmedName)) {
+    return "Category name cannot consist of special characters only.";
+  }
+
+  // Must contain at least one letter
+  if (!/\p{L}/u.test(trimmedName)) {
+    return "Category name must contain at least one letter.";
+  }
+
+  if (trimmedName.length < 2) {
+    return "Category name must be at least 2 characters.";
+  }
+
+  // Allow letters, numbers, spaces, and standard service category symbols: & - / ' , . ( )
+  const VALID_CATEGORY_NAME_REGEX = /^[\p{L}\p{N}\s&/'.,()\-]+$/u;
+  if (!VALID_CATEGORY_NAME_REGEX.test(trimmedName)) {
+    return "Category name contains invalid characters. Only letters, numbers, spaces, and basic symbols (&, -, ', /, ,, ., ()) are allowed.";
+  }
+
   return null;
 }
 

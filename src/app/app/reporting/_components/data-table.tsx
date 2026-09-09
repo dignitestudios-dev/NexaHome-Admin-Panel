@@ -50,6 +50,7 @@ export default function DataTable({
   });
 
   const rows = data?.rows ?? [];
+  console.log(data);
   const totalPages = data?.totalPages ?? 1;
   const nameColumn = getReportNameColumnLabel(tab);
   const metricColumn = getReportMetricColumnLabel(tab);
