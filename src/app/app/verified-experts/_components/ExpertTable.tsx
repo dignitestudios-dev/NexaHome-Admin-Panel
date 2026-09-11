@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -12,8 +12,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Pagination from "@/components/global/pagination";
 import { useExperts } from "@/features/experts/experts.hooks";
-import type { Expert } from "@/features/experts/experts.types";
+import type { Expert, ExpertStatusFilter } from "@/features/experts/experts.types";
 import { formatDate } from "@/lib/date";
+import { ExpertFilter } from "./ExpertFilter";
+import { X } from "lucide-react";
 
 const EXPERTS_PER_PAGE = 10;
 
@@ -43,9 +45,22 @@ function getCompanyName(expert: Expert) {
 
 export const ExpertTable = () => {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isError, error } = useExperts(page, EXPERTS_PER_PAGE);
+  const [statusFilter, setStatusFilter] = useState<ExpertStatusFilter>("all");
+
+  const isBadgeActive =
+    statusFilter === "active" ? true : statusFilter === "inactive" ? false : undefined;
+
+  const { data, isLoading, isError, error } = useExperts(
+    page,
+    EXPERTS_PER_PAGE,
+    isBadgeActive
+  );
   const experts = data?.experts ?? [];
   const totalPages = data?.totalPages ?? 1;
+
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter]);
 
   const handlePrev = () => {
     if (page > 1) setPage((prev) => prev - 1);
@@ -57,6 +72,26 @@ export const ExpertTable = () => {
 
   return (
     <>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          {statusFilter !== "all" && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EFF7F8] text-[#005864] text-xs font-semibold rounded-full border border-[#E1ECEE]">
+              <span>Status: {statusFilter === "active" ? "Active" : "Inactive"}</span>
+              <button
+                type="button"
+                onClick={() => setStatusFilter("all")}
+                className="hover:text-red-500 transition-colors cursor-pointer"
+                title="Clear filter"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <ExpertFilter value={statusFilter} onChange={setStatusFilter} />
+        </div>
+      </div>
       <div className="rounded-3xl overflow-hidden">
         <Table>
           <TableHeader>

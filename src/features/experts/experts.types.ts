@@ -51,9 +51,12 @@ export interface ExpertsListResponse {
   totalPages?: number;
 }
 
+export type ExpertStatusFilter = "all" | "active" | "inactive";
+
 export interface GetExpertsParams {
   page?: number;
   limit?: number;
+  isBadgeActive?: boolean;
 }
 
 export interface ExpertsListResult {

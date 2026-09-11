@@ -17,15 +17,17 @@ export interface DashboardSummary {
 
 export interface DashboardInsights {
   activeUsersPercent: number;
-  activeUsersCount?: number;
-  activeUsersTotal?: number;
   repeatHomeownersPercent: number;
-  repeatHomeownersCount?: number;
-  repeatHomeownersTotal?: number;
   completedJobsPercent: number;
-  completedJobsCount?: number;
-  completedJobsTotal?: number;
   averageRating: number;
+  activeUsersRatio?: string;
+  repeatHomeownersRatio?: string;
+  completedJobsRatio?: string;
+  activeUsers?: number;
+  repeatHomeowners?: number;
+  completedJobs?: number;
+  totalUsers?: number;
+  totalJobs?: number;
 }
 
 export interface PopularCategory {

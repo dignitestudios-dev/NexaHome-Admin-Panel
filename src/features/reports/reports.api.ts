@@ -7,6 +7,7 @@ import type {
   ReportRow,
   ReportTab,
   ReportsListResult,
+  ReportsPagination,
   ReportsUsersListResponse,
 } from "./reports.types";
 
@@ -158,7 +159,9 @@ async function getReportsList({
     const rows = extractRows(payload, tab).map((row) =>
       normalizeReportRow(row, tab)
     );
-    const pagination = payload?.pagination;
+    const pagination = (data?.pagination ?? payload?.pagination) as
+      | ReportsPagination
+      | undefined;
 
     const total =
       pagination?.totalItems ??

@@ -106,9 +106,11 @@ export default function JobsActivityTable({
               <TableHead className="py-6 font-semibold text-[#1A1A1A]">
                 Posted By
               </TableHead>
-              <TableHead className="py-6 font-semibold text-[#1A1A1A]">
-                Vendor Assigned
-              </TableHead>
+              {status !== "pending" && (
+                <TableHead className="py-6 font-semibold text-[#1A1A1A]">
+                  Vendor Assigned
+                </TableHead>
+              )}
               <TableHead className="py-6 font-semibold text-[#1A1A1A]">
                 Job Status
               </TableHead>
@@ -154,9 +156,11 @@ export default function JobsActivityTable({
                     <TableCell className="py-6">
                       <PersonCell person={postedBy} />
                     </TableCell>
-                    <TableCell className="py-6">
-                      <PersonCell person={vendor} preferCompanyName />
-                    </TableCell>
+                    {status !== "pending" && (
+                      <TableCell className="py-6">
+                        <PersonCell person={vendor} preferCompanyName />
+                      </TableCell>
+                    )}
                     <TableCell className="py-6 font-bold">
                       <span className={getJobActivityStatusColor(jobStatus)}>
                         {formatJobActivityStatus(jobStatus)}

@@ -110,7 +110,7 @@ export function ProviderVerificationDetailsModal({
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5 shrink-0">
             <DialogHeader className="space-y-0">
               <DialogTitle className="text-[22px] font-semibold text-slate-900">
-                Provider Verification Details
+                Service Provider Verification Details
               </DialogTitle>
             </DialogHeader>
             <button
@@ -137,17 +137,19 @@ export function ProviderVerificationDetailsModal({
                   <h2 className="text-[22px] font-semibold text-slate-900">
                     {data.name}
                   </h2>
-                  <span className={cn(
+        
+                </div>
+                
+              </div>
+                        <span className={cn(
                     "mt-1 inline-flex rounded-md px-2.5 py-1 text-[12px] font-medium ring-1 capitalize",
                     data.identityStatus === "approved" ? "bg-emerald-50 text-emerald-700 ring-emerald-200" :
-                    data.identityStatus === "rejected" ? "bg-red-50 text-red-700 ring-red-200" :
-                    data.identityStatus === "pending" ? "bg-amber-50 text-amber-700 ring-amber-200" :
-                    "bg-slate-50 text-slate-700 ring-slate-200"
+                      data.identityStatus === "rejected" ? "bg-red-50 text-red-700 ring-red-200" :
+                        data.identityStatus === "pending" ? "bg-amber-50 text-amber-700 ring-amber-200" :
+                          "bg-slate-50 text-slate-700 ring-slate-200"
                   )}>
                     {data.identityStatus.replace("-", " ")}
                   </span>
-                </div>
-              </div>
             </div>
 
             {data.identityStatus === "rejected" && data.identityRejectReason && (
@@ -234,9 +236,9 @@ export function ProviderVerificationDetailsModal({
               </div>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50/50">
                 {!data.idCard?.front && !data.idCard?.back ? (
-                   <div className="col-span-full py-6 text-center text-sm text-slate-500">
-                     No ID card documents provided.
-                   </div>
+                  <div className="col-span-full py-6 text-center text-sm text-slate-500">
+                    No ID card documents provided.
+                  </div>
                 ) : (
                   <>
                     {data.idCard.front && (
@@ -278,9 +280,10 @@ export function ProviderVerificationDetailsModal({
                 {isRejecting ? (
                   <div className="flex flex-col gap-3">
                     <label className="text-sm font-medium text-slate-700">Reason for Rejection</label>
-                    <textarea 
+                    <textarea
                       className="w-full border border-slate-300 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#005864]"
                       rows={3}
+                      maxLength={200}
                       placeholder="e.g. Document image is blurred and expiry date is not visible"
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}

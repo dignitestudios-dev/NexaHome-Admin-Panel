@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchInput from "@/components/global/search-input";
 import { PartnersTable } from "../partner-dashboard/_components/partners-table";
 import {
@@ -18,7 +18,16 @@ import { usePartnerSummary } from "@/features/partners/partners.hooks";
 
 const ReferralManagement = () => {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const { data: summary, isLoading } = usePartnerSummary();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const cardsData = [
     {
@@ -63,7 +72,7 @@ const ReferralManagement = () => {
       <ReferralCards cards={cardsData} />
 
       <div className="relative z-10 mt-6">
-        <PartnersTable search={search} />
+        <PartnersTable search={debouncedSearch} />
       </div>
     </div>
   );

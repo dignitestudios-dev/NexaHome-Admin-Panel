@@ -402,7 +402,7 @@ export function UserDetailsModal({
 
                     {(userDetail.companyName || user.companyName) && <InfoCell icon={FileText} label="Company Name" value={userDetail.companyName || user.companyName || "—"} />}
                     {userDetail.contactEmail && <InfoCell icon={Mail} label="Contact Email" value={userDetail.contactEmail} />}
-                    {userDetail.identityStatus && <InfoCell icon={Shield} label="Identity Status" value={userDetail.identityStatus} />}
+                    {userDetail.identityStatus && <InfoCell icon={Shield} label="Identity Status" className="capitalize" value={userDetail.identityStatus} />}
                     {userDetail.averageRating !== undefined && <InfoCell icon={FileText} label="Average Rating" value={String(userDetail.averageRating)} />}
                     {userDetail.totalReviews !== undefined && <InfoCell icon={FileText} label="Total Reviews" value={String(userDetail.totalReviews)} />}
 

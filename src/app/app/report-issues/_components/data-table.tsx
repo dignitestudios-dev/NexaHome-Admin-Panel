@@ -18,9 +18,60 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Eye } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Eye,
+  Mail,
+  Phone,
+  X,
+} from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useReportIssues, useUpdateReportIssueStatus } from "@/features/report-issues/report-issues.hooks";
 import type { ReportIssueStatus, ReportIssue } from "@/features/report-issues/report-issues.types";
+import { cn } from "@/lib/utils";
+
+function getInitials(name?: string) {
+  if (!name?.trim()) return "U";
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+const normalizeStatus = (status?: string) => status?.toLowerCase().replace("-", "_");
+
+const getStatusBadgeClass = (status?: string) => {
+  const s = normalizeStatus(status);
+  switch (s) {
+    case "pending":
+      return "bg-red-100 text-red-700 border border-red-200";
+    case "in_progress":
+      return "bg-yellow-100 text-yellow-800 border border-yellow-200";
+    case "resolved":
+      return "bg-green-100 text-green-800 border border-green-200";
+    default:
+      return "bg-gray-100 text-gray-700 border border-gray-200";
+  }
+};
+
+const getStatusDotClass = (status?: string) => {
+  const s = normalizeStatus(status);
+  switch (s) {
+    case "pending":
+      return "bg-red-500";
+    case "in_progress":
+      return "bg-yellow-500";
+    case "resolved":
+      return "bg-green-500";
+    default:
+      return "bg-gray-500";
+  }
+};
 
 type DataTableProps = {
   status: ReportIssueStatus;
@@ -165,76 +216,199 @@ export default function DataTable({
       </div>
 
       <Dialog open={!!viewIssue} onOpenChange={(open) => !open && setViewIssue(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Issue Details</DialogTitle>
-            <DialogDescription>
-              Reported on {viewIssue?.reportedDate ? new Date(viewIssue.reportedDate).toLocaleString() : "—"}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent
+          showCloseButton={false}
+          className="flex w-[min(640px,calc(100vw-2rem))] max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl p-0 sm:max-w-none gap-0"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 shrink-0">
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-3">
+                <DialogTitle className="text-xl font-semibold text-slate-900">
+                  Issue Details
+                </DialogTitle>
+                {viewIssue && (
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize",
+                      getStatusBadgeClass(viewIssue.status)
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full",
+                        getStatusDotClass(viewIssue.status)
+                      )}
+                    />
+                    {viewIssue.status?.replace("_", " ")}
+                  </span>
+                )}
+              </div>
+              <DialogDescription className="text-xs text-slate-500">
+                Reported on{" "}
+                {viewIssue?.reportedDate
+                  ? new Date(viewIssue.reportedDate).toLocaleString(undefined, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })
+                  : "—"}
+              </DialogDescription>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setViewIssue(null)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
 
           {viewIssue && (
-            <div className="grid gap-6 py-4">
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-500">Title</span>
-                <p className="text-base font-semibold break-all">{viewIssue.title}</p>
-              </div>
+            <>
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+                {/* Issue Content Card */}
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-[#004D54]" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#004D54]">
+                      Reported Issue
+                    </span>
+                  </div>
 
-              <div className="flex flex-col gap-1 overflow-hidden">
-                <span className="text-sm font-medium text-gray-500">Description</span>
-                <div className="p-4 break-all bg-gray-50 rounded-lg max-h-60 overflow-y-auto whitespace-pre-wrap text-sm">
-                  {viewIssue.description}
-                </div>
-              </div>
+                  <h3 className="text-base font-semibold text-slate-900 leading-snug break-words">
+                    {viewIssue.title}
+                  </h3>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-500">Reported By</span>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{viewIssue.user?.name}</span>
-                    <span className="text-sm text-gray-500">{viewIssue.user?.email}</span>
-                    <span className="text-sm text-gray-500">{viewIssue.user?.phone}</span>
+                  <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-3.5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap break-words max-h-52 overflow-y-auto">
+                    {viewIssue.description}
                   </div>
                 </div>
-                
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-500">Role</span>
-                  <span className="capitalize">{viewIssue.role?.replace("-", " ") || "—"}</span>
+
+                {/* User & Role Details Card */}
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    Reporter Information
+                  </span>
+
+                  <div className="flex items-start gap-3.5 mt-4">
+                    <Avatar className="h-11 w-11 ring-2 ring-slate-100 shrink-0">
+                      <AvatarFallback className="bg-[#004D54] text-sm font-semibold text-white">
+                        {getInitials(viewIssue.user?.name)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-slate-900 text-sm">
+                          {viewIssue.user?.name || "—"}
+                        </span>
+                        <span className="inline-flex rounded-md bg-[#004D54]/10 px-2 py-0.5 text-[11px] font-medium text-[#004D54] capitalize">
+                          {viewIssue.role?.replace("-", " ") || "User"}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 gap-x-4 pt-1 text-xs text-slate-600">
+                        {viewIssue.user?.email && (
+                          <div className="flex items-center gap-2 truncate">
+                            <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                            <span className="truncate">{viewIssue.user.email}</span>
+                          </div>
+                        )}
+                        {viewIssue.user?.phone && (
+                          <div className="flex items-center gap-2 truncate">
+                            <Phone className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                            <span>{viewIssue.user.phone}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 truncate sm:col-span-2">
+                          <Calendar className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                          <span>
+                            Reported on{" "}
+                            {viewIssue.reportedDate
+                              ? new Date(viewIssue.reportedDate).toLocaleString(undefined, {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })
+                              : "—"}
+                          </span>
+                        </div>
+                        {viewIssue.resolvedDate && (
+                          <div className="flex items-center gap-2 truncate sm:col-span-2 text-emerald-700">
+                            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                            <span>
+                              Resolved on{" "}
+                              {new Date(viewIssue.resolvedDate).toLocaleString(undefined, {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              })}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-500">Status</span>
-                  <span className="capitalize font-medium text-primary">
+              {/* Footer */}
+              <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50/70 px-6 py-4 shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-slate-500">Status:</span>
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold capitalize",
+                      getStatusBadgeClass(viewIssue.status)
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "w-2 h-2 rounded-full",
+                        getStatusDotClass(viewIssue.status)
+                      )}
+                    />
                     {viewIssue.status?.replace("_", " ")}
                   </span>
                 </div>
-                
-                <div className="flex items-center gap-2">
-                  {status === "pending" && (
+
+                <div className="flex items-center gap-2.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setViewIssue(null)}
+                    className="h-10 rounded-xl border-slate-200 px-4 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  >
+                    Close
+                  </Button>
+
+                  {viewIssue.status === "pending" && (
                     <Button
                       variant="default"
-                      className="bg-[#004D54] hover:bg-[#004D54]/90"
+                      className="h-10 rounded-xl bg-[#004D54] px-4 text-xs font-medium text-white hover:bg-[#004D54]/90 inline-flex items-center gap-1.5"
                       disabled={processingId === viewIssue._id}
                       onClick={() => handleUpdateStatus(viewIssue._id, "in_progress")}
                     >
+                      <Clock className="h-3.5 w-3.5" />
                       {processingId === viewIssue._id ? "Updating..." : "Start Progress"}
                     </Button>
                   )}
-                  {status === "in_progress" && (
+
+                  {viewIssue.status === "in_progress" && (
                     <Button
                       variant="default"
-                      className="bg-[#004D54] hover:bg-[#004D54]/90"
+                      className="h-10 rounded-xl bg-[#004D54] px-4 text-xs font-medium text-white hover:bg-[#004D54]/90 inline-flex items-center gap-1.5"
                       disabled={processingId === viewIssue._id}
                       onClick={() => handleUpdateStatus(viewIssue._id, "resolved")}
                     >
-                      {processingId === viewIssue._id ? "Updating..." : "Resolve"}
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {processingId === viewIssue._id ? "Updating..." : "Resolve Issue"}
                     </Button>
                   )}
                 </div>
               </div>
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>

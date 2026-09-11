@@ -334,12 +334,25 @@ export function EditCategoryModal({
                     maxLength={MAX_CATEGORY_NAME_LENGTH}
                     onChange={(e) => {
                       setSubmitError("");
-                      setShowNameError(false);
+                      if (showNameError && !validateCategoryName(e.target.value)) {
+                        setShowNameError(false);
+                      }
                       setName(e.target.value);
+                    }}
+                    onBlur={() => {
+                      if (name.trim()) {
+                        setShowNameError(true);
+                      }
                     }}
                     placeholder="e.g. Air Duct Cleaning"
                     disabled={updateCategory.isPending}
-                    className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
+                    aria-invalid={!!nameError}
+                    className={cn(
+                      "h-11 rounded-xl bg-slate-50 text-[15px] focus-visible:ring-[#005864]",
+                      nameError
+                        ? "border-red-300 focus-visible:ring-red-500"
+                        : "border-slate-200"
+                    )}
                   />
                   {nameError ? (
                     <p className="text-sm text-red-600">{nameError}</p>
@@ -402,7 +415,7 @@ export function EditCategoryModal({
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label
                     htmlFor="edit-dollar-price"
                     className="text-sm font-medium text-slate-700"
@@ -423,7 +436,7 @@ export function EditCategoryModal({
                     disabled={updateCategory.isPending}
                     className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
                   />
-                </div>
+                </div> */}
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-700">

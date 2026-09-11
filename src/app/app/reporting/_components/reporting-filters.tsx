@@ -124,6 +124,15 @@ export function ReportingFilters({
     setError("");
   }, [open, value.startDate, value.endDate]);
 
+  const handleResetAll = () => {
+    setStartDate("");
+    setEndDate("");
+    setActivePicker(null);
+    setError("");
+    onApply({});
+    setOpen(false);
+  };
+
   const handleClearAll = () => {
     setStartDate("");
     setEndDate("");
@@ -155,7 +164,7 @@ export function ReportingFilters({
           <FaFilter className="h-[20px] w-[20px] text-white" />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="overflow-y-auto">
+      <DrawerContent className="overflow-y-auto overflow-hidden">
         <DrawerHeader>
           <DrawerTitle className="heading">Filters</DrawerTitle>
           <DrawerClose asChild>
@@ -166,14 +175,14 @@ export function ReportingFilters({
         </DrawerHeader>
 
         <div className="p-4">
-          <div className="mb-4 flex justify-between">
+          <div className="mb-4 flex items-center justify-between">
             <span className="text-[20px] font-semibold">Date Range</span>
             <button
               type="button"
-              onClick={handleClearAll}
-              className="text-[#005864] underline"
+              onClick={handleResetAll}
+              className="text-[#005864] underline hover:opacity-80"
             >
-              Clear all
+              Reset all
             </button>
           </div>
 
@@ -210,12 +219,15 @@ export function ReportingFilters({
           </div>
         </div>
 
-        <DrawerFooter className="flex w-full justify-center bg-[#F8F8F8]">
-          <DrawerClose asChild>
-            <Button variant="outline" className="flex-1">
-              Cancel
-            </Button>
-          </DrawerClose>
+        <DrawerFooter className="flex w-full flex-row gap-3 bg-[#F8F8F8]">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleResetAll}
+            className="flex-1"
+          >
+            Reset all
+          </Button>
           <Button onClick={handleApply} className="flex-1">
             Apply
           </Button>
