@@ -21,7 +21,7 @@ const STATUS_OPTIONS: { label: string; value: ProviderVerificationStatus }[] = [
   { label: "Approved", value: "approved" },
   { label: "Rejected", value: "rejected" },
   { label: "Not Provided", value: "not-provided" },
-  { label: "Resubmission", value: "resubmission" },
+  // { label: "Resubmission", value: "resubmission" },
 ];
 
 type ProviderVerificationStatusFilterProps = {
