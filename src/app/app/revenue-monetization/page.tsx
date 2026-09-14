@@ -74,6 +74,39 @@ export default function RevenueDashboard() {
     return [`$${amount}`, labels[key] ?? key];
   };
 
+  const YearlyTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: { value: number }[];
+    label?: string;
+  }) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div
+        style={{
+          background: "#fff",
+          border: "1px solid #E5E7EB",
+          borderRadius: 10,
+          padding: "10px 14px",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+          fontSize: 12,
+          minWidth: 160,
+        }}
+      >
+        <p style={{ fontWeight: 700, color: "#1A1A1A", marginBottom: 4 }}>
+          {label}
+        </p>
+        <p style={{ color: "#0A6270" }}>
+          Total Revenue :{" "}
+          <strong>${(Number(payload[0]?.value) || 0).toFixed(2)}</strong>
+        </p>
+      </div>
+    );
+  };
+
   const axisTickStyle = { fill: "#9CA3AF", fontSize: 11, fontWeight: 500 };
 
   const stats = [
@@ -228,7 +261,9 @@ export default function RevenueDashboard() {
                   />
                   <Tooltip
                     cursor={{ fill: "rgba(0,0,0,0.04)" }}
-                    formatter={(value) => [`$${Number(value) || 0}`, "Total Revenue"]}
+                    content={<YearlyTooltip />}
+                    isAnimationActive={false}
+                    wrapperStyle={{ zIndex: 10, pointerEvents: "none" }}
                   />
                   <Bar
                     dataKey="revenue"
@@ -236,6 +271,7 @@ export default function RevenueDashboard() {
                     fill="#0A6270"
                     radius={[8, 8, 0, 0]}
                     maxBarSize={72}
+                    isAnimationActive={false}
                   />
                 </BarChart>
               ) : (

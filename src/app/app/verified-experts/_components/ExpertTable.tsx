@@ -72,8 +72,12 @@ export const ExpertTable = () => {
 
   return (
     <>
+      {/* Header row: title left, filter right */}
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <h1 className="heading capitalize text-[#1C1C1C] tracking-tight">
+            trusted expert badges
+          </h1>
           {statusFilter !== "all" && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EFF7F8] text-[#005864] text-xs font-semibold rounded-full border border-[#E1ECEE]">
               <span>Status: {statusFilter === "active" ? "Active" : "Inactive"}</span>
@@ -88,9 +92,7 @@ export const ExpertTable = () => {
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <ExpertFilter value={statusFilter} onChange={setStatusFilter} />
-        </div>
+        <ExpertFilter value={statusFilter} onChange={setStatusFilter} />
       </div>
       <div className="rounded-3xl overflow-hidden">
         <Table>
