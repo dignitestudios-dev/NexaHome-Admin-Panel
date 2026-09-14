@@ -28,7 +28,7 @@ export const ExpertFilter = ({ value, onChange }: ExpertFilterProps) => (
         className="relative bg-[#005864] hover:bg-[#004750] text-white w-[44px] h-[44px] p-0 rounded-[10px] shadow-sm focus-visible:ring-0 transition-colors"
         aria-label="Filter experts by status"
       >
-        <Filter className="w-5 h-5" />
+        <Filter className="w-5 h-5 text-white fill-white" />
         {value !== "all" && (
           <span className="absolute top-2 right-2 w-2 h-2 bg-[#16BC4E] rounded-full ring-2 ring-white" />
         )}
