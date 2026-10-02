@@ -55,6 +55,20 @@ function applyCategoryPatch(
     name: serverCategory?.name ?? variables.name,
     isActive: serverCategory?.isActive ?? variables.isActive,
     icon: serverCategory?.icon ?? category.icon,
+    primary_phrases:
+      serverCategory?.primary_phrases ??
+      variables.primary_phrases ??
+      category.primary_phrases,
+    alternate_keywords:
+      serverCategory?.alternate_keywords ??
+      variables.alternate_keywords ??
+      category.alternate_keywords,
+    related_search_phrases:
+      serverCategory?.related_search_phrases ??
+      variables.related_search_phrases ??
+      category.related_search_phrases,
+    relatedCategories:
+      serverCategory?.relatedCategories ?? category.relatedCategories,
   };
 }
 

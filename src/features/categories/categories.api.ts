@@ -160,6 +160,10 @@ export const categoriesApi = {
     icon,
     oneTimeCredits,
     recurringCredits,
+    primary_phrases,
+    alternate_keywords,
+    related_search_phrases,
+    relatedCategories,
   }: CreateCategoryPayload): Promise<Category> => {
     try {
       const formData = new FormData();
@@ -173,7 +177,32 @@ export const categoriesApi = {
 
       const { data } = await API.post("/admin/categories", formData);
       const payload = data?.data ?? data;
-      return (payload?.category ?? payload) as Category;
+      let category = (payload?.category ?? payload) as Category;
+
+      // If array fields are provided, update category via JSON to guarantee array types
+      const hasExtraFields =
+        (primary_phrases && primary_phrases.length > 0) ||
+        (alternate_keywords && alternate_keywords.length > 0) ||
+        (related_search_phrases && related_search_phrases.length > 0) ||
+        (relatedCategories && relatedCategories.length > 0);
+
+      if (hasExtraFields && category?._id) {
+        const patchData: Record<string, unknown> = {
+          name: name.trim(),
+        };
+        if (primary_phrases !== undefined) patchData.primary_phrases = primary_phrases;
+        if (alternate_keywords !== undefined) patchData.alternate_keywords = alternate_keywords;
+        if (related_search_phrases !== undefined) patchData.related_search_phrases = related_search_phrases;
+        if (relatedCategories !== undefined) patchData.relatedCategories = relatedCategories;
+
+        const updateRes = await API.patch(`/admin/categories/${category._id}`, patchData);
+        const updatePayload = updateRes?.data?.data ?? updateRes?.data;
+        if (updatePayload?.category || updatePayload?._id) {
+          category = (updatePayload?.category ?? updatePayload) as Category;
+        }
+      }
+
+      return category;
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
     }
@@ -188,16 +217,43 @@ export const categoriesApi = {
     recurringCredits,
     dollarPrice,
     isActive,
+    primary_phrases,
+    alternate_keywords,
+    related_search_phrases,
+    relatedCategories,
   }: UpdateCategoryPayload): Promise<Category> => {
     try {
+      // If no new icon is uploaded, send pure JSON to preserve array structure (even for 1 item)
+      if (!icon) {
+        const jsonPayload: Record<string, unknown> = {
+          name: name.trim(),
+          isactive: isActive,
+          isActive: isActive,
+        };
+        if (description?.trim()) jsonPayload.description = description.trim();
+        if (oneTimeCredits != null) jsonPayload.oneTimeCredits = oneTimeCredits;
+        if (recurringCredits != null) jsonPayload.recurringCredits = recurringCredits;
+        if (dollarPrice != null) {
+          jsonPayload.dollarPrice = dollarPrice;
+          jsonPayload.price = dollarPrice;
+        }
+        if (primary_phrases !== undefined) jsonPayload.primary_phrases = primary_phrases;
+        if (alternate_keywords !== undefined) jsonPayload.alternate_keywords = alternate_keywords;
+        if (related_search_phrases !== undefined) jsonPayload.related_search_phrases = related_search_phrases;
+        if (relatedCategories !== undefined) jsonPayload.relatedCategories = relatedCategories;
+
+        const { data } = await API.patch(`/admin/categories/${id}`, jsonPayload);
+        const payload = data?.data ?? data;
+        return (payload?.category ?? payload) as Category;
+      }
+
+      // When icon file is uploaded, use FormData for the file and basic properties
       const formData = new FormData();
       formData.append("name", name.trim());
       if (description?.trim()) {
         formData.append("description", description.trim());
       }
-      if (icon) {
-        formData.append("icon", icon);
-      }
+      formData.append("icon", icon);
       if (oneTimeCredits != null) {
         formData.append("oneTimeCredits", String(oneTimeCredits));
       }
@@ -209,10 +265,36 @@ export const categoriesApi = {
         formData.append("price", String(dollarPrice));
       }
       formData.append("isactive", String(isActive));
+      formData.append("isActive", String(isActive));
 
       const { data } = await API.patch(`/admin/categories/${id}`, formData);
       const payload = data?.data ?? data;
-      return (payload?.category ?? payload) as Category;
+      let updatedCategory = (payload?.category ?? payload) as Category;
+
+      // Ensure array fields with any length (including 1) are cleanly updated via JSON
+      const hasArrayFields =
+        primary_phrases !== undefined ||
+        alternate_keywords !== undefined ||
+        related_search_phrases !== undefined ||
+        relatedCategories !== undefined;
+
+      if (hasArrayFields) {
+        const arrayPayload: Record<string, unknown> = {
+          name: name.trim(),
+        };
+        if (primary_phrases !== undefined) arrayPayload.primary_phrases = primary_phrases;
+        if (alternate_keywords !== undefined) arrayPayload.alternate_keywords = alternate_keywords;
+        if (related_search_phrases !== undefined) arrayPayload.related_search_phrases = related_search_phrases;
+        if (relatedCategories !== undefined) arrayPayload.relatedCategories = relatedCategories;
+
+        const arrayRes = await API.patch(`/admin/categories/${id}`, arrayPayload);
+        const arrayResPayload = arrayRes?.data?.data ?? arrayRes?.data;
+        if (arrayResPayload?.category || arrayResPayload?._id) {
+          updatedCategory = (arrayResPayload?.category ?? arrayResPayload) as Category;
+        }
+      }
+
+      return updatedCategory;
     } catch (error) {
       throw new Error(getApiErrorMessage(error));
     }
