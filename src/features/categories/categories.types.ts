@@ -17,14 +17,29 @@ export interface CategoryIcon {
   updatedAt?: string;
 }
 
-export interface Category {
+export interface RelatedCategoryItem {
   _id: string;
   name: string;
-  description?: string;
+  slug?: string;
+  icon?: string | CategoryIcon | null;
+}
+
+export interface Category {
+  _id: string;
+  id?: string;
+  name: string;
+  slug?: string;
+  description?: string | null;
   credits: number | null;
   pricing?: CategoryPricing | null;
   icon?: CategoryIcon | null;
+  conversionRate?: number;
   isActive?: boolean | "active" | "inactive";
+  allowedProviders?: unknown[];
+  primary_phrases?: string[];
+  alternate_keywords?: string[];
+  related_search_phrases?: string[];
+  relatedCategories?: (RelatedCategoryItem | string)[];
   createdAt: string;
   updatedAt: string;
 }
@@ -61,6 +76,10 @@ export interface CreateCategoryPayload {
   icon: File;
   oneTimeCredits: number;
   recurringCredits: number;
+  primary_phrases?: string[];
+  alternate_keywords?: string[];
+  related_search_phrases?: string[];
+  relatedCategories?: string[];
 }
 
 export interface UpdateCategoryPayload {
@@ -72,6 +91,10 @@ export interface UpdateCategoryPayload {
   recurringCredits?: number;
   dollarPrice?: number;
   isActive: boolean;
+  primary_phrases?: string[];
+  alternate_keywords?: string[];
+  related_search_phrases?: string[];
+  relatedCategories?: string[];
 }
 
 export interface CategoriesListResult {
@@ -81,3 +104,4 @@ export interface CategoriesListResult {
   total: number;
   totalPages: number;
 }
+

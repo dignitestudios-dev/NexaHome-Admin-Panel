@@ -18,6 +18,7 @@ import {
   Eye,
   AlertCircle,
   UserCheck,
+  GitPullRequest,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -66,6 +67,11 @@ const menu = [
   },
   { label: "Reporting", icon: FileText, link: "/app/reporting" },
   { label: "Categories", icon: Folder, link: "/app/categories" },
+  {
+    label: "Category Requests",
+    icon: GitPullRequest,
+    link: "/app/category-requests",
+  },
   {
     label: "Partner & Referral Management",
     icon: Handshake,

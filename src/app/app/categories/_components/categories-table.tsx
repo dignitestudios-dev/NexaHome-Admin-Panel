@@ -199,6 +199,10 @@ export const CategoriesTable = ({
         categoryId={selectedCategory?._id ?? null}
         preview={selectedCategory}
         onClose={() => setSelectedCategory(null)}
+        onEdit={(cat) => {
+          setSelectedCategory(null);
+          setEditingCategory(cat);
+        }}
       />
 
       <EditCategoryModal

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
   Dialog,
   DialogHeader,
@@ -12,8 +12,23 @@ import { Dialog as DialogPrimitive } from "radix-ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2, Upload, X } from "lucide-react";
-import { useCreateCategory } from "@/features/categories/categories.hooks";
+import {
+  ChevronDown,
+  ImagePlus,
+  Layers,
+  Loader2,
+  Plus,
+  Search,
+  Sparkles,
+  Tag,
+  Upload,
+  X,
+} from "lucide-react";
+import {
+  useCategories,
+  useCreateCategory,
+} from "@/features/categories/categories.hooks";
+import type { Category } from "@/features/categories/categories.types";
 import {
   validateCategoryCredits,
   validateCategoryIcon,
@@ -35,6 +50,319 @@ const initialFormState = {
   recurringCredits: "",
 };
 
+function TagInputEditor({
+  label,
+  placeholder,
+  tags,
+  onChange,
+  disabled,
+  icon: Icon,
+  badgeColor = "slate",
+}: {
+  label: string;
+  placeholder: string;
+  tags: string[];
+  onChange: (tags: string[]) => void;
+  disabled?: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+  badgeColor?: "teal" | "slate" | "sky";
+}) {
+  const [inputValue, setInputValue] = useState("");
+
+  const addTag = () => {
+    const trimmed = inputValue.trim();
+    if (!trimmed) return;
+
+    if (!tags.some((t) => t.toLowerCase() === trimmed.toLowerCase())) {
+      onChange([...tags, trimmed]);
+    }
+    setInputValue("");
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag();
+    }
+  };
+
+  const removeTag = (indexToRemove: number) => {
+    onChange(tags.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const badgeStyles = {
+    teal: "border-[#005864]/20 bg-[#005864]/5 text-[#005864]",
+    slate: "border-slate-200 bg-slate-100 text-slate-700",
+    sky: "border-sky-200 bg-sky-50 text-sky-800",
+  }[badgeColor];
+
+  return (
+    <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4">
+      <div className="flex items-center justify-between">
+        <Label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+          <Icon className="h-4 w-4 text-[#005864]" />
+          {label}
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 px-1.5 text-xs font-semibold text-slate-600">
+            {tags.length}
+          </span>
+        </Label>
+        {tags.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => onChange([])}
+            disabled={disabled}
+            className="text-xs text-slate-400 transition hover:text-red-600 disabled:opacity-50"
+          >
+            Clear all
+          </button>
+        ) : null}
+      </div>
+
+      <div className="flex gap-2">
+        <Input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+          className="h-10 flex-1 rounded-lg border-slate-200 bg-slate-50 text-sm focus-visible:ring-[#005864]"
+        />
+        <Button
+          type="button"
+          onClick={addTag}
+          disabled={disabled || !inputValue.trim()}
+          variant="outline"
+          className="h-10 rounded-lg border-[#005864]/30 bg-white text-[#005864] hover:bg-[#005864]/5"
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          Add
+        </Button>
+      </div>
+
+      {tags.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {tags.map((tag, idx) => (
+            <span
+              key={idx}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium",
+                badgeStyles
+              )}
+            >
+              <span>{tag}</span>
+              <button
+                type="button"
+                onClick={() => removeTag(idx)}
+                disabled={disabled}
+                className="rounded-full p-0.5 opacity-70 transition hover:bg-black/10 hover:opacity-100 disabled:opacity-50"
+                aria-label={`Remove ${tag}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-slate-400 italic">
+          No items added yet. Type above and press Enter or click Add.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function RelatedCategoriesEditor({
+  selected,
+  onChange,
+  disabled,
+}: {
+  selected: { _id: string; name: string; slug?: string }[];
+  onChange: (updated: { _id: string; name: string; slug?: string }[]) => void;
+  disabled?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchFilter, setSearchFilter] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchFilter.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchFilter]);
+
+  const { data: categoriesData, isLoading: isLoadingCategories } =
+    useCategories({
+      limit: 50,
+      search: debouncedSearch || undefined,
+      status: "all",
+    });
+
+  const allCategories = categoriesData?.categories ?? [];
+  const selectedIds = new Set(selected.map((s) => s._id));
+
+  const availableCategories = allCategories.filter(
+    (cat) => !selectedIds.has(cat._id)
+  );
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelect = (cat: Category) => {
+    onChange([
+      ...selected,
+      {
+        _id: cat._id,
+        name: cat.name,
+        slug: cat.slug,
+      },
+    ]);
+    setSearchFilter("");
+  };
+
+  const handleRemove = (idToRemove: string) => {
+    onChange(selected.filter((s) => s._id !== idToRemove));
+  };
+
+  return (
+    <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4">
+      <div className="flex items-center justify-between">
+        <Label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+          <Layers className="h-4 w-4 text-[#005864]" />
+          Related Categories
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 px-1.5 text-xs font-semibold text-slate-600">
+            {selected.length}
+          </span>
+        </Label>
+        {selected.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => onChange([])}
+            disabled={disabled}
+            className="text-xs text-slate-400 transition hover:text-red-600 disabled:opacity-50"
+          >
+            Clear all
+          </button>
+        ) : null}
+      </div>
+
+      <div className="relative" ref={dropdownRef}>
+        <div
+          onClick={() => {
+            if (!disabled) setIsOpen((prev) => !prev);
+          }}
+          className={cn(
+            "flex h-10 w-full cursor-pointer items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 transition hover:bg-slate-100/70",
+            disabled && "cursor-not-allowed opacity-60"
+          )}
+        >
+          <span className="text-slate-500">
+            {availableCategories.length > 0
+              ? "Select categories to relate..."
+              : "Click to search and select categories..."}
+          </span>
+          <ChevronDown className="h-4 w-4 text-slate-400" />
+        </div>
+
+        {isOpen && (
+          <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+            <div className="sticky top-0 mb-2 bg-white pb-1">
+              <Input
+                type="text"
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                placeholder="Search categories (queries backend)..."
+                className="h-8 rounded-lg border-slate-200 bg-slate-50 text-xs focus-visible:ring-[#005864]"
+                autoFocus
+              />
+            </div>
+            {isLoadingCategories ? (
+              <div className="flex items-center justify-center py-4 text-xs text-slate-500">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin text-[#005864]" />
+                Searching categories...
+              </div>
+            ) : availableCategories.length > 0 ? (
+              <div className="space-y-1">
+                {availableCategories.map((cat) => (
+                  <button
+                    key={cat._id}
+                    type="button"
+                    onClick={() => handleSelect(cat)}
+                    className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-800 transition hover:bg-[#005864]/10 hover:text-[#005864]"
+                  >
+                    <div>
+                      <span className="font-medium">{cat.name}</span>
+                      {cat.slug ? (
+                        <span className="ml-2 font-mono text-[11px] text-slate-400">
+                          #{cat.slug}
+                        </span>
+                      ) : null}
+                    </div>
+                    <Plus className="h-4 w-4 text-[#005864]" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="py-3 text-center text-xs text-slate-400">
+                {debouncedSearch
+                  ? `No categories matching "${debouncedSearch}"`
+                  : "No additional categories available"}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {selected.length > 0 ? (
+        <div className="grid grid-cols-1 gap-2 pt-1 sm:grid-cols-2">
+          {selected.map((item) => (
+            <div
+              key={item._id}
+              className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50/80 px-3 py-2"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold text-slate-800">
+                  {item.name}
+                </p>
+                {item.slug ? (
+                  <p className="truncate font-mono text-[10px] text-slate-400">
+                    {item.slug}
+                  </p>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemove(item._id)}
+                disabled={disabled}
+                className="ml-2 rounded-md p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                aria-label={`Remove ${item.name}`}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-slate-400 italic">
+          No related categories selected.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export const AddCategoryModal = ({
   open,
   onOpenChange,
@@ -50,6 +378,14 @@ export const AddCategoryModal = ({
   const [submitError, setSubmitError] = useState("");
   const [showNameError, setShowNameError] = useState(false);
   const [showCreditsError, setShowCreditsError] = useState(false);
+
+  // New keys state
+  const [primaryPhrases, setPrimaryPhrases] = useState<string[]>([]);
+  const [alternateKeywords, setAlternateKeywords] = useState<string[]>([]);
+  const [relatedSearchPhrases, setRelatedSearchPhrases] = useState<string[]>([]);
+  const [selectedRelatedCategories, setSelectedRelatedCategories] = useState<
+    { _id: string; name: string; slug?: string }[]
+  >([]);
 
   useEffect(() => {
     return () => {
@@ -70,6 +406,10 @@ export const AddCategoryModal = ({
     setSubmitError("");
     setShowNameError(false);
     setShowCreditsError(false);
+    setPrimaryPhrases([]);
+    setAlternateKeywords([]);
+    setRelatedSearchPhrases([]);
+    setSelectedRelatedCategories([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -80,9 +420,7 @@ export const AddCategoryModal = ({
     onOpenChange(false);
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSubmitError("");
     if (name === "name") {
@@ -92,7 +430,9 @@ export const AddCategoryModal = ({
     }
     if (name === "oneTimeCredits" || name === "recurringCredits") {
       setShowCreditsError(false);
-      const digitsOnly = value.replace(/\D/g, "").slice(0, MAX_CATEGORY_CREDITS_DIGITS);
+      const digitsOnly = value
+        .replace(/\D/g, "")
+        .slice(0, MAX_CATEGORY_CREDITS_DIGITS);
       setFormData((prev) => ({
         ...prev,
         [name]: digitsOnly,
@@ -186,6 +526,10 @@ export const AddCategoryModal = ({
         icon: iconFile,
         oneTimeCredits: Number(formData.oneTimeCredits.trim()),
         recurringCredits: Number(formData.recurringCredits.trim()),
+        primary_phrases: primaryPhrases,
+        alternate_keywords: alternateKeywords,
+        related_search_phrases: relatedSearchPhrases,
+        relatedCategories: selectedRelatedCategories.map((c) => c._id),
       },
       {
         onSuccess: () => {
@@ -210,14 +554,14 @@ export const AddCategoryModal = ({
       <DialogPortal>
         <DialogOverlay />
 
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 flex w-[min(560px,calc(100vw-2rem))] max-h-[92vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 flex w-[min(680px,calc(100vw-2rem))] max-h-[92vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
           <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
             <DialogHeader className="space-y-1 text-left">
               <DialogTitle className="text-[22px] font-semibold text-slate-900">
                 Add Category
               </DialogTitle>
               <p className="text-sm text-slate-500">
-                Create a new service category with icon.
+                Create a new service category with pricing, keywords, and related categories.
               </p>
             </DialogHeader>
             <button
@@ -315,7 +659,9 @@ export const AddCategoryModal = ({
                   className="h-11 rounded-xl border-slate-200 bg-slate-50 text-[15px] focus-visible:ring-[#005864]"
                 />
                 {recurringCreditsError ? (
-                  <p className="text-sm text-red-600">{recurringCreditsError}</p>
+                  <p className="text-sm text-red-600">
+                    {recurringCreditsError}
+                  </p>
                 ) : null}
               </div>
             </div>
@@ -387,6 +733,46 @@ export const AddCategoryModal = ({
                 <p className="text-sm text-red-600">{iconError}</p>
               ) : null}
             </div>
+
+            {/* Primary Phrases Editor */}
+            <TagInputEditor
+              label="Primary Phrases"
+              placeholder="e.g. air duct cleaning, vent cleaning"
+              tags={primaryPhrases}
+              onChange={setPrimaryPhrases}
+              disabled={createCategory.isPending}
+              icon={Sparkles}
+              badgeColor="teal"
+            />
+
+            {/* Alternate Keywords Editor */}
+            <TagInputEditor
+              label="Alternate Keywords"
+              placeholder="e.g. indoor air cleaning, ducts, vents"
+              tags={alternateKeywords}
+              onChange={setAlternateKeywords}
+              disabled={createCategory.isPending}
+              icon={Tag}
+              badgeColor="slate"
+            />
+
+            {/* Related Search Phrases Editor */}
+            <TagInputEditor
+              label="Related Search Phrases"
+              placeholder="e.g. air quality, heating and cooling"
+              tags={relatedSearchPhrases}
+              onChange={setRelatedSearchPhrases}
+              disabled={createCategory.isPending}
+              icon={Search}
+              badgeColor="sky"
+            />
+
+            {/* Related Categories Selector */}
+            <RelatedCategoriesEditor
+              selected={selectedRelatedCategories}
+              onChange={setSelectedRelatedCategories}
+              disabled={createCategory.isPending}
+            />
 
             {submitError ? (
               <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
