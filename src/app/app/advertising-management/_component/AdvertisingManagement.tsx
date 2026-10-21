@@ -56,7 +56,7 @@ const AdvertisingManagement = () => {
       </div>
 
       {/* Disabled Notification Banner */}
-      <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-800 shadow-sm">
+      {/* <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-800 shadow-sm">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
           <Lock className="h-5 w-5" />
         </div>
@@ -66,10 +66,10 @@ const AdvertisingManagement = () => {
             Advertising features are currently placeholder campaigns and have been disabled until actual pricing and campaign verification becomes available. Creating or modifying ads is temporarily unavailable.
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Disabled / Greyed-out Section Container */}
-      <div className="opacity-50 pointer-events-none select-none cursor-not-allowed filter grayscale-[30%]">
+      {/* <div className=""> */}
         <div className="flex justify-between items-center pb-6">
           <div className="flex items-center gap-2">
             <SearchInput
@@ -117,7 +117,7 @@ const AdvertisingManagement = () => {
           page={page}
           onPageChange={setPage}
         />
-      </div>
+      {/* </div> */}
     </div>
   );
 };
