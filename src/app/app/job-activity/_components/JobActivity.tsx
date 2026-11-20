@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import type { JobActivityStatus } from "@/features/jobs-activity/jobs-activity.types";
 import JobsActivityTable from "./jobs-activity-table";
 
-const tabs = ["Pending", "In-Progress", "Completed"] as const;
+const tabs = ["Pending" , "Completed"] as const;
 type JobActivityTab = (typeof tabs)[number];
 
 const TAB_STATUS_MAP: Record<JobActivityTab, JobActivityStatus> = {
   Pending: "pending",
-  "In-Progress": "accepted",
+  // "In-Progress": "accepted",
   Completed: "completed",
 };
 

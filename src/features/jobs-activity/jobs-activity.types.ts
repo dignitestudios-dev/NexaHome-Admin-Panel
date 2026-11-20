@@ -6,9 +6,26 @@ export type JobActivityStatus =
   | "cancelled";
 
 export interface JobActivityProfilePicture {
-  location?: string;
+  _id?: string;
   fileName?: string;
+  key?: string;
+  mimetype?: string;
+  location?: string;
   filename?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AppliedProvider {
+  _id: string;
+  name?: string;
+  companyName?: string;
+  email?: string;
+  profilePicture?: JobActivityProfilePicture | string | null;
+  averageRating?: number;
+  totalReviews?: number;
+  appliedAt?: string;
+  isSelected?: boolean;
 }
 
 export interface JobActivityPerson {
@@ -29,6 +46,7 @@ export interface JobActivityItem {
   vendorAssigned: JobActivityPerson | null;
   status: JobActivityStatus | string;
   datePosted: string;
+  appliedProviders?: AppliedProvider[];
 }
 
 export interface JobsActivityPagination {
