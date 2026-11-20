@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
@@ -24,8 +25,13 @@ import {
   getVendorDisplayName,
 } from "@/features/jobs-activity/jobs-activity.api";
 import { useJobsActivity } from "@/features/jobs-activity/jobs-activity.hooks";
-import type { JobActivityStatus } from "@/features/jobs-activity/jobs-activity.types";
+import type {
+  JobActivityItem,
+  JobActivityStatus,
+} from "@/features/jobs-activity/jobs-activity.types";
 import { formatDate } from "@/lib/date";
+import { Eye } from "lucide-react";
+import AppliedProvidersModal from "./applied-providers-modal";
 
 type JobsActivityTableProps = {
   status: JobActivityStatus;
@@ -74,6 +80,9 @@ export default function JobsActivityTable({
   page,
   onPageChange,
 }: JobsActivityTableProps) {
+  const [selectedJob, setSelectedJob] = useState<JobActivityItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { data, isLoading, isError, error } = useJobsActivity({
     page,
     limit: ITEMS_PER_PAGE,
@@ -90,6 +99,13 @@ export default function JobsActivityTable({
   const handleNext = () => {
     if (page < totalPages) onPageChange(page + 1);
   };
+
+  const handleViewAppliedProviders = (job: JobActivityItem) => {
+    setSelectedJob(job);
+    setIsModalOpen(true);
+  };
+
+  const totalCols = status === "completed" ? 7 : status === "pending" ? 5 : 6;
 
   return (
     <div className="w-full">
@@ -114,22 +130,34 @@ export default function JobsActivityTable({
               <TableHead className="py-6 font-semibold text-[#1A1A1A]">
                 Job Status
               </TableHead>
-              <TableHead className="rounded-r-3xl px-6 py-6 font-semibold text-[#1A1A1A]">
+              <TableHead
+                className={`${
+                  status === "completed" ? "" : "rounded-r-3xl"
+                } px-6 py-6 font-semibold text-[#1A1A1A]`}
+              >
                 Date Posted
               </TableHead>
+              {status === "completed" && (
+                <TableHead className="rounded-r-3xl px-6 py-6 font-semibold text-[#1A1A1A] text-center">
+                  Actions
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isError ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-red-600">
+                <TableCell
+                  colSpan={totalCols}
+                  className="h-24 text-center text-red-600"
+                >
                   ⚠ {(error as Error)?.message ?? "Failed to load job activity."}
                 </TableCell>
               </TableRow>
             ) : isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={totalCols} className="h-24 text-center">
                   <div className="flex items-center justify-center">
                     <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
                     <span className="ml-2">Loading...</span>
@@ -169,12 +197,25 @@ export default function JobsActivityTable({
                     <TableCell className="px-6 py-6 text-[#1A1A1A]">
                       {formatDate(getJobDatePosted(job))}
                     </TableCell>
+                    {status === "completed" && (
+                      <TableCell className="px-6 py-6 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleViewAppliedProviders(job)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#F0F5F6] text-[#005864] hover:bg-[#e2eced] transition cursor-pointer"
+                          title="View Applied Providers"
+                          aria-label="View Applied Providers"
+                        >
+                          <Eye size={18} />
+                        </button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={totalCols} className="h-24 text-center">
                   No records found.
                 </TableCell>
               </TableRow>
@@ -191,6 +232,15 @@ export default function JobsActivityTable({
           onNext={handleNext}
         />
       )}
+
+      <AppliedProvidersModal
+        open={isModalOpen}
+        job={selectedJob}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedJob(null);
+        }}
+      />
     </div>
   );
 }
